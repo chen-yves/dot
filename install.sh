@@ -69,6 +69,11 @@ main() {
   # Ghostty
   make_link "$DOT_DIR/config/ghostty/config" "$HOME/.config/ghostty/config"
 
+  # OmniWM
+  if [ "$OS" = "macOS" ]; then
+    make_link "$DOT_DIR/config/omniwm/settings.toml" "$HOME/.config/omniwm/settings.toml"
+  fi
+
   # VSCode
   if [ "$OS" = "macOS" ]; then
     make_link "$DOT_DIR/config/vscode/keybindings.json" "$HOME/Library/Application Support/Code/User/keybindings.json"
