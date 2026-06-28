@@ -182,19 +182,4 @@
       ]
     },
   ],
-  "taiwanStock.tabs": {
-    "tabs": [
-      {
-        "id": "tab_mqxgpam7_vq6kps1",
-        "name": "我的關注股",
-        "stocks": [],
-        "sortMode": "auto",
-        "customOrder": [],
-        "createdAt": 1782631388671,
-        "updatedAt": 1782631388671
-      }
-    ],
-    "activeTabId": "tab_mqxgpam7_vq6kps1",
-    "defaultTabId": "tab_mqxgpam7_vq6kps1"
-  },
 }
