@@ -71,6 +71,7 @@
       "omniwm"
       "raycast"
       "tradingview"
+      "utm"
       "visual-studio-code"
     ];
     masApps = {
