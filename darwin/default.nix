@@ -58,20 +58,14 @@
       upgrade = true;
       cleanup = "zap";
     };
-    taps = [
-      "BarutSRB/tap"
-    ] ++ builtins.attrNames (config.nix-homebrew.taps or {});
+    taps = [ ] ++ builtins.attrNames (config.nix-homebrew.taps or {});
     brews = [
       "mas"
     ];
     casks = [
-      "discord"
       "futubull"
       "google-chrome"
-      "omniwm"
       "raycast"
-      "tradingview"
-      "utm"
       "visual-studio-code"
     ];
     masApps = {
