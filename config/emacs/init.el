@@ -20,8 +20,7 @@
   (setq package-archives
         '(("gnu" . "https://elpa.gnu.org/packages/")
           ("nongnu" . "https://elpa.nongnu.org/nongnu/")
-          ("melpa" . "https://melpa.org/packages/")
-          ("melpa-stable" . "https://stable.melpa.org/packages/"))))
+          ("melpa" . "https://melpa.org/packages/"))))
 
 (use-package emacs
   :ensure nil
@@ -36,9 +35,9 @@
                              "JetbrainsMono Nerd Font"
                              "Fira Code"
                              "Cascadia Code"
-                             "SF Mono"
                              "Monaco"
                              "Menlo"
+                             "SF Mono"
                              "Hack"
                              "Source Code Pro"
                              "Monaco"
@@ -47,16 +46,16 @@
                when (find-font (font-spec :name font))
                return (set-face-attribute 'default nil
                                           :family font
-                                          :height (cond ((eq system-type 'darwin) 130)
+                                          :height (cond ((eq system-type 'darwin) 140)
                                                         ((eq system-type 'windows-nt) 100)
                                                         (t 100))))
 
       ;; Set mode-line font
       (cl-loop for font in '("JetbrainsMono Nerd Font"
                              "Cascadia Code"
-                             "SF Mono"
                              "Monaco"
                              "Menlo"
+                             "SF Mono"
                              "Arial"
                              "Helvetica"
                              "Times New Roman")
@@ -258,14 +257,52 @@
   (setq evil-escape-delay 0.2))
 
 (use-package evil-nerd-commenter
+  :after evil
   :bind
   (:map evil-normal-state-map
         ("gcc" . evilnc-comment-or-uncomment-lines))
   (:map evil-visual-state-map
         ("gc" . evilnc-comment-or-uncomment-lines)))
 
+(use-package evil-goggles
+  :hook (evil-mode . evil-goggles-mode)
+  :config
+  (setq evil-goggles-pulse t)
+  (setq evil-goggles-duration 0.5)
+  (evil-goggles-use-diff-faces))
+
 (use-package evil-matchit
   :hook (evil-mode . global-evil-matchit-mode))
+
+(use-package evil-surround
+  :hook (evil-mode . global-evil-surround-mode))
+
+(use-package evil-visualstar
+  :hook (evil-mode . global-evil-visualstar-mode))
+
+(use-package evil-indent-plus
+  :after evil
+  :bind
+  (:map evil-inner-text-objects-map
+        ("i" . evil-indent-plus-i-indent)
+        ("I" . evil-indent-plus-i-indent-up)
+        ("J" . evil-indent-plus-i-indent-up-down))
+  (:map evil-outer-text-objects-map
+        ("i" . evil-indent-plus-a-indent)
+        ("I" . evil-indent-plus-a-indent-up)
+        ("J" . evil-indent-plus-a-indent-up-down)))
+
+(use-package evil-snipe
+  :hook
+  (evil-mode . evil-snipe-mode)
+  (evil-mode . evil-snipe-override-mode)
+  :config
+  (setq evil-snipe-scope 'whole-buffer)
+  (setq evil-snipe-repeat-scope 'whole-buffer))
+
+(use-package evil-terminal-cursor-changer
+  :when (not (display-graphic-p))
+  :hook (evil-mode . etcc-on))
 
 (use-package evil-leader
   :hook (evil-mode . global-evil-leader-mode)
@@ -290,6 +327,7 @@
     "wd" 'delete-other-windows
     "wD" 'delete-window
     "tm" 'dired-sidebar-toggle-sidebar
+    "tv" 'vundo
     "hd" 'helpful-at-point
     "hf" 'helpful-callable
     "hv" 'helpful-variable
@@ -320,7 +358,6 @@
   :config
   (setq dashboard-display-icons-p t)
   (setq dashboard-set-file-icons t)
-  (setq dashboard-set-file-icons t)
   (setq dashboard-week-agenda nil)
   (setq dashboard-icon-type 'nerd-icons)
   (setq dashboard-icon-file-height 1.25)
@@ -350,7 +387,7 @@
 (use-package doom-modeline
   :hook (after-init . doom-modeline-mode)
   :config
-  (setq doom-modeline-height 20)
+  (setq doom-modeline-height 25)
   (setq doom-modeline-bar-width 5)
   (setq doom-modeline-minor-modes t))
 
@@ -377,6 +414,7 @@
   :hook (prog-mode . highlight-numbers-mode))
 
 (use-package highlight-defined
+  :when (<= emacs-major-version 30)
   :hook (emacs-lisp-mode . highlight-defined-mode))
 
 (use-package indent-bars
@@ -415,8 +453,8 @@
 
 (use-package popper
   :bind
-  (("C-`"   . popper-toggle)
-   ("M-`"   . popper-cycle)
+  (("C-`" . popper-toggle)
+   ("M-`" . popper-cycle)
    ("C-M-`" . popper-toggle-type))
   :hook
   (window-setup . popper-mode)
@@ -608,7 +646,6 @@
 (use-package dired-sidebar
   :commands dired-sidebar-toggle-sidebar
   :config
-  (setq dired-sidebar-subtree-line-prefix "__")
   (setq dired-sidebar-theme 'nerd-icons)
   (setq dired-sidebar-use-term-integration t)
   (setq dired-sidebar-use-custom-font t))
@@ -701,6 +738,7 @@
 (use-package scss-mode)
 (use-package sass-mode)
 (use-package mmm-mode)
+(use-package groovy-mode)
 (use-package erlang)
 (use-package ess)
 (use-package scala-mode)
@@ -813,5 +851,22 @@
 
 (use-package gcmh
   :hook (after-init . gcmh-mode))
+
+(use-package ghostel
+  :when (not (eq system-type 'windows-nt))
+  :commands ghostel)
+
+(use-package eat
+  :when (not (eq system-type 'windows-nt))
+  :commands eat)
+
+(use-package eshell-syntax-highlighting
+  :hook (eshell-mode . eshell-syntax-highlighting-mode))
+
+(use-package exec-path-from-shell
+  :when (memq window-system '(mac ns x))
+  :defer 5
+  :config
+  (exec-path-from-shell-initialize))
 
 ;;; init.el ends here

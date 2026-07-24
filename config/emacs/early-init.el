@@ -34,6 +34,7 @@
 (setq initial-major-mode 'fundamental-mode)
 (setq default-frame-alist '((menu-bar-lines . 0)
                             (tool-bar-lines . 0)
+                            (internal-border-width . 12)
                             (horizontal-scroll-bars)
                             (vertical-scroll-bars)))
 
