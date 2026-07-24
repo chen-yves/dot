@@ -66,13 +66,12 @@ main() {
   OS=$(detect_os)
   DOT_DIR=$(cd "$(dirname "$0")" && pwd)
 
+  # Emacs
+  make_link "$DOT_DIR/config/emacs/early-init.el" "$HOME/.config/emacs/early-init.el"
+  make_link "$DOT_DIR/config/emacs/init.el" "$HOME/.config/emacs/init.el"
+
   # Ghostty
   make_link "$DOT_DIR/config/ghostty/config" "$HOME/.config/ghostty/config"
-
-  # OmniWM
-  if [ "$OS" = "macOS" ]; then
-    make_link "$DOT_DIR/config/omniwm/settings.toml" "$HOME/.config/omniwm/settings.toml"
-  fi
 
   # VSCode
   if [ "$OS" = "macOS" ]; then

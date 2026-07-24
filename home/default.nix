@@ -2,6 +2,7 @@
 {
   imports = [
     ./direnv.nix
+    ./emacs.nix
     ./font.nix
     ./ghostty.nix
     ./vscode.nix
