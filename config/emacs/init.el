@@ -4,16 +4,16 @@
 
 (use-package use-package
   :ensure nil
-  :config
-  (setq use-package-always-ensure t)
-  (setq use-package-always-defer t)
-  (setq use-package-expand-minimally t)
-  (setq use-package-enable-imenu-support t))
+  :custom
+  (use-package-always-ensure t)
+  (use-package-always-defer t)
+  (use-package-expand-minimally t)
+  (use-package-enable-imenu-support t))
 
 (use-package package
   :ensure nil
-  :custom
-  (package-enable-at-startup nil)
+  :init
+  (setq package-enable-at-startup nil)
   :config
   (package-initialize)
   (setq package-quickstart t)
@@ -29,7 +29,7 @@
     "Setup fonts."
     (when (display-graphic-p)
       (require 'cl-lib)
-      ;; Set default font
+      ;; Default
       (cl-loop for font in '("FiraCode Nerd Font"
                              "CaskaydiaCove Nerd Font"
                              "JetbrainsMono Nerd Font"
@@ -50,7 +50,7 @@
                                                         ((eq system-type 'windows-nt) 100)
                                                         (t 100))))
 
-      ;; Set mode-line font
+      ;; Modeline
       (cl-loop for font in '("JetbrainsMono Nerd Font"
                              "Cascadia Code"
                              "Monaco"
@@ -64,7 +64,7 @@
                         (set-face-attribute 'mode-line nil :family font :inherit 'variable-pitch)
                         (set-face-attribute 'mode-line-inactive nil :family font :inherit 'variable-pitch)))
 
-      ;; Specify font for all unicode characters
+      ;; Symbol
       (cl-loop for font in '("Apple Symbols"
                              "Segoe UI Symbol"
                              "Symbola"
@@ -72,14 +72,19 @@
                when (find-font (font-spec :name font))
                return (set-fontset-font t 'symbol (font-spec :family font) nil 'prepend))
 
-      ;; Specify font for Emoji characters
+      ;; Unicode
+      (cl-loop for font in '("Segoe UI" "Arial Unicode MS")
+               when (find-font (font-spec :name font))
+               return (set-fontset-font t 'unicode (font-spec :family font) nil 'prepend))
+
+      ;; Emoji
       (cl-loop for font in '("Noto Color Emoji"
                              "Apple Color Emoji"
                              "Segoe UI Emoji")
                when (find-font (font-spec :name font))
                return (set-fontset-font t 'emoji (font-spec :family font) nil 'prepend))
 
-      ;; Specify font for Chinese characters
+      ;; Chinese
       (cl-loop for font in '("LXGW Neo Xihei"
                              "LXGW WenKai Mono"
                              "WenQuanYi Micro Hei Mono"
@@ -88,7 +93,7 @@
                              "Simhei")
                when (find-font (font-spec :name font))
                return (progn
-                        (setq face-font-rescale-alist `((,font . 0.9)))
+                        (setq face-font-rescale-alist `((,font . 1.0)))
                         (set-fontset-font t 'han (font-spec :family font))))))
   :hook
   (window-setup . setup-fonts)
@@ -150,7 +155,7 @@
   :ensure nil
   :config
   (setq jit-lock-defer-time 0.1)
-  (setq jit-lock-stealth-time 1.5)
+  (setq jit-lock-stealth-time nil)
   (setq jit-lock-chunk-size 1000))
 
 (use-package paren
@@ -349,6 +354,7 @@
 (use-package standard-themes)
 (use-package color-theme-sanityinc-tomorrow)
 (use-package color-theme-sanityinc-solarized)
+
 (use-package doom-themes
   :hook (after-init . (lambda () (load-theme 'doom-one t))))
 
@@ -390,6 +396,11 @@
   (setq doom-modeline-height 25)
   (setq doom-modeline-bar-width 5)
   (setq doom-modeline-minor-modes t))
+
+(use-package hide-mode-line
+  :hook
+  (completion-list-mode . hide-mode-line-mode)
+  (dired-sidebar-mode . hide-mode-line-mode))
 
 (use-package centaur-tabs
   :defer 10
@@ -659,6 +670,11 @@
 (use-package vundo
   :commands vundo)
 
+(use-package esup
+  :commands esup
+  :config
+  (setq esup-depth 0))
+
 (use-package symbols-outline
   :commands symbols-outline-show
   :hook
@@ -729,21 +745,35 @@
 (use-package nix-mode
   :mode "\\.nix\\'")
 
+(use-package vue-mode
+  :mode "\\.vue\\'")
+
 (use-package powershell)
 (use-package dotenv-mode)
 (use-package slime)
+(use-package nginx-mode)
+(use-package vimrc-mode)
 (use-package php-mode)
+(use-package elixir-mode)
+(use-package vala-mode)
 (use-package toml-mode)
 (use-package emmet-mode)
+(use-package janet-mode)
+(use-package angular-mode)
 (use-package scss-mode)
 (use-package sass-mode)
 (use-package mmm-mode)
 (use-package groovy-mode)
+(use-package polymode)
 (use-package erlang)
 (use-package ess)
+(use-package rjsx-mode)
 (use-package scala-mode)
 (use-package dart-mode)
 (use-package swift-mode)
+(use-package kotlin-mode)
+(use-package matlab-mode)
+(use-package pandoc-mode)
 (use-package jinja2-mode)
 (use-package git-modes)
 
@@ -801,7 +831,7 @@
   (setq lsp-keymap-prefix "C-c l")
   :config
   (setq lsp-log-io nil)
-  ;; (setq lsp-use-plist t)
+  ;; (setq lsp-use-plists t)
   (setq lsp-idle-delay 0.5)
   (setq lsp-completion-provider :capf)
   (setq lsp-headerline-breadcrumb-enable nil)

@@ -2,12 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
-(when (or (featurep 'esup-child)
-          (daemonp)
-          (boundp 'startup-now)
-          noninteractive)
-  (setq package-enable-at-startup nil))
-
+(setq package-enable-at-startup nil)
 (setq gc-cons-percentage 1.0)
 (setq gc-cons-threshold most-positive-fixnum)
 (setq read-process-output-max #x10000)
@@ -28,7 +23,7 @@
 (setq load-prefer-newer noninteractive)
 (prefer-coding-system 'utf-8)
 (setq use-package-enable-imenu-support t)
-(setq inhibit-startup-message nil)
+(setq inhibit-startup-message t)
 (setq inhibit-startup-screen t)
 (setq frame-inhibit-implied-resize t)
 (setq initial-major-mode 'fundamental-mode)
