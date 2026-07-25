@@ -42,9 +42,18 @@ filetype plugin indent on
 " Keybindings:
 let g:mapleader = "\<Space>"
 let g:maplocalleader = ','
+imap jk <Esc>
+cmap jk <Esc>
 nnoremap j gj
 nnoremap k gk
-imap jk <Esc>
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+inoremap <C-a> <HOME>
+inoremap <C-e> <END>
+cnoremap <C-a> <HOME>
+cnoremap <C-e> <END>
 
 " AutoCommand:
 augroup FileTypeWrap
