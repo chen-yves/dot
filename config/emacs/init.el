@@ -1,5 +1,19 @@
 ;;; init.el --- My Emacs Configuration. -*- lexical-binding: t no-byte-compile: t -*-
 ;;; Commentary:
+
+;; References:
+;; https://github.com/seagle0128/.emacs.d
+;; https://github.com/redguardtoo/emacs.d
+;; https://github.com/manateelazycat/lazycat-emacs
+;; https://github.com/MiniApollo/kickstart.emacs
+;; https://github.com/daviwil/emacs-from-scratch
+;; https://github.com/purcell/emacs.d
+;; https://github.com/syl20bnr/spacemacs
+;; https://github.com/doomemacs/core
+;; https://github.com/bbatsov/prelude
+;; https://github.com/Eason0210/.emacs.d
+;; https://github.com/jamescherti/minimal-emacs.d
+
 ;;; Code:
 
 (use-package use-package
@@ -250,7 +264,13 @@
   :hook (after-init . evil-mode)
   :init
   (setq evil-want-integration t)
-  (setq evil-want-keybinding nil))
+  (setq evil-want-keybinding nil)
+  :config
+  (evil-ex-define-cmd "q" 'kill-current-buffer)
+  (evil-ex-define-cmd "wq" #'(lambda ()
+                               (interactive)
+                               (save-buffer)
+                               (kill-buffer-and-window))))
 
 (use-package evil-collection
   :hook (evil-mode . evil-collection-init))
