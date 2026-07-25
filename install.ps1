@@ -118,16 +118,21 @@ function Invoke-DotfilesSetup {
     "$dotfilesRoot\config\emacs\early-init.el" = "$env:APPDATA\.emacs.d\early-init.el"
     "$dotfilesRoot\config\emacs\init.el" = "$env:APPDATA\.emacs.d\init.el"
 
-    # Windows Terminal
-    "$dotfilesRoot\config\wt\settings.json" = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+    # Neovim
+    "$dotfilesRoot\config\nvim\init.lua" = "$env:LOCALAPPDATA\nvim\init.lua"
+
+    # Vim
+    "$dotfilesRoot\config\vim\init.vim" = "$env:USERPROFILE\_vimrc"
 
     # VSCode
     "$dotfilesRoot\config\vscode\keybindings.json" = "$env:APPDATA\Code\User\keybindings.json"
     "$dotfilesRoot\config\vscode\settings.json" = "$env:APPDATA\Code\User\settings.json"
+
+    # Windows Terminal
+    "$dotfilesRoot\config\wt\settings.json" = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
   }
 
   foreach ($link in $links.GetEnumerator()) {
-
     New-SymbolicLinkSafe `
       -Source $link.Key `
       -Target $link.Value
