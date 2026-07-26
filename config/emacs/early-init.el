@@ -3,6 +3,7 @@
 ;;; Code:
 
 (setq package-enable-at-startup nil)
+(setq load-prefer-newer t)
 (setq gc-cons-percentage 1.0)
 (setq gc-cons-threshold most-positive-fixnum)
 (setq read-process-output-max #x10000)

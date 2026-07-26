@@ -40,7 +40,7 @@
 (use-package emacs
   :ensure nil
   :init
-  (defun setup-fonts ()
+  (defun my/setup-fonts ()
     "Setup fonts."
     (when (display-graphic-p)
       (require 'cl-lib)
@@ -111,8 +111,8 @@
                         (setq face-font-rescale-alist `((,font . 1.0)))
                         (set-fontset-font t 'han (font-spec :family font))))))
   :hook
-  (window-setup . setup-fonts)
-  (server-after-make-frame . setup-fonts)
+  (window-setup . my/setup-fonts)
+  (server-after-make-frame . my/setup-fonts)
   :config
   (setq fast-but-imprecise-scrolling t)
   (setq long-line-threshold 1000)
