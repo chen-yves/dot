@@ -12,7 +12,6 @@ vim.opt.autowrite = true
 vim.opt.clipboard = "unnamed,unnamedplus"
 vim.opt.cmdheight = 1
 vim.opt.cursorline = true
-vim.opt.colorcolumn = "80"
 vim.opt.history = 2000
 vim.opt.virtualedit = "block"
 vim.opt.number = true
@@ -106,7 +105,7 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 })
 
 --- Packages ---
-local profile = os.getenv("NVIM_PROFILE") or "mini"
+local profile = os.getenv("NVIM_PROFILE") or "self"
 if profile == "self" and not (vim.version().minor >= 12 or vim.version().major > 0) then
   vim.notify("Neovim version is lower than 0.12.0, switching 'mini' distribution.", vim.log.levels.WARN)
   profile = "mini"
@@ -129,6 +128,14 @@ if profile == "lazy" then
     { import = "lazyvim.plugins.extras.lang.python" },
     { import = "lazyvim.plugins.extras.lsp.none-ls" },
     { import = "lazyvim.plugins.extras.ui.treesitter-context" },
+    {
+      "folke/snacks.nvim",
+      opts = {
+        scroll = {
+          enabled = false,
+        },
+      },
+    },
   }
 end
 if profile == "astro" then
@@ -193,17 +200,17 @@ if profile == "mini" then
         vim.keymap.set("n", "<leader>fw", "<Cmd>Pick grep_live<CR>", { desc = "Find Words" })
         require("mini.clue").setup({
           triggers = {
-            { mode = { 'n', 'x' }, keys = '<Leader>' },
-            { mode = 'n', keys = '[' },
-            { mode = 'n', keys = ']' },
-            { mode = 'i', keys = '<C-x>' },
-            { mode = { 'n', 'x' }, keys = 'g' },
-            { mode = { 'n', 'x' }, keys = "'" },
-            { mode = { 'n', 'x' }, keys = '`' },
-            { mode = { 'n', 'x' }, keys = '"' },
-            { mode = { 'i', 'c' }, keys = '<C-r>' },
-            { mode = 'n', keys = '<C-w>' },
-            { mode = { 'n', 'x' }, keys = 'z' },
+            { mode = { "n", "x" }, keys = "<Leader>" },
+            { mode = "n", keys = "[" },
+            { mode = "n", keys = "]" },
+            { mode = "i", keys = "<C-x>" },
+            { mode = { "n", "x" }, keys = "g" },
+            { mode = { "n", "x" }, keys = "'" },
+            { mode = { "n", "x" }, keys = "`" },
+            { mode = { "n", "x" }, keys = '"' },
+            { mode = { "i", "c" }, keys = "<C-r>" },
+            { mode = "n", keys = "<C-w>" },
+            { mode = { "n", "x" }, keys = "z" },
           },
           clues = {
             require("mini.clue").gen_clues.square_brackets(),
@@ -265,6 +272,14 @@ if profile == "self" then
       end,
     },
     {
+      "Bekaboo/dropbar.nvim",
+      lazy = true,
+      event = "BufReadPost",
+      config = function()
+        require("dropbar").setup({})
+      end,
+    },
+    {
       "nvim-lualine/lualine.nvim",
       lazy = true,
       event = "BufReadPost",
@@ -276,11 +291,404 @@ if profile == "self" then
       end,
     },
     {
+      "lukas-reineke/indent-blankline.nvim",
+      lazy = true,
+      event = "BufReadPost",
+      config = function()
+        require("ibl").setup({
+          enabled = true,
+          debounce = 200,
+          indent = {
+            char = "│",
+            tab_char = "│",
+            smart_indent_cap = true,
+            priority = 1,
+          },
+          whitespace = { remove_blankline_trail = true },
+          scope = {
+            enabled = true,
+            char = "┃",
+            show_start = false,
+            show_end = false,
+            injected_languages = true,
+            priority = 1000,
+          },
+        })
+      end,
+    },
+    {
+      "rcarriga/nvim-notify",
+      lazy = true,
+      event = "BufReadPost",
+      config = function()
+        require("notify").setup({
+          stages = "fade",
+          render = "default",
+          fps = 20,
+          timeout = 2000,
+          minimum_width = 50,
+          background_colour = "NotifyBackground",
+          on_open = function(win)
+            vim.api.nvim_set_option_value("winblend", 0, { scope = "local", win = win })
+            vim.api.nvim_win_set_config(win, { zindex = 90 })
+          end,
+          level = "INFO",
+        })
+        vim.notify = require("notify")
+      end,
+    },
+    {
+      "lewis6991/gitsigns.nvim",
+      lazy = true,
+      event = "BufReadPost",
+      config = function()
+        require("gitsigns").setup({
+          signs = {
+            add = { text = "┃" },
+            change = { text = "┃" },
+            delete = { text = "_" },
+            topdelete = { text = "‾" },
+            changedelete = { text = "~" },
+            untracked = { text = "┆" },
+          },
+          auto_attach = true,
+          signcolumn = true,
+          sign_priority = 6,
+          update_debounce = 100,
+          word_diff = false,
+          current_line_blame = true,
+          diff_opts = { internal = true },
+          watch_gitdir = { follow_files = true },
+          current_line_blame_opts = { delay = 1000, virt_text = true, virtual_text_pos = "eol" },
+        })
+      end,
+    },
+    {
+      "folke/lazydev.nvim",
+      ft = "lua",
+      opts = {
+        library = {
+          { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+        },
+      },
+    },
+    {
+      "folke/trouble.nvim",
+      cmd = "Trouble",
+      keys = {
+        { "<leader>xx", function() vim.cmd("Trouble diagnostics toggle") end, mode = { "n" }, desc = "Diagnostics" }
+      },
+      config = function()
+        require("trouble").setup({})
+      end,
+    },
+    {
+      "folke/todo-comments.nvim",
+      dependencies = { "nvim-lua/plenary.nvim" },
+      keys = {
+        { "<leader>fd", function() vim.cmd("TodoFzfLua") end, mode = { "n" }, desc = "Find todo" }
+      },
+      config = function()
+        require("todo-comments").setup({})
+      end,
+    },
+    {
+      "folke/paint.nvim",
+      lazy = true,
+      event = "BufReadPost",
+      config = function()
+        require("paint").setup({
+          highlights = {
+            {
+              filter = { filetype = "lua" },
+              pattern = "%s*%-%-%-%s*(@%w+)",
+              hl = "Constant",
+            },
+            {
+              filter = { filetype = "python" },
+              pattern = "%s*([_%w]+:)",
+              hl = "Constant",
+            },
+          },
+        })
+      end,
+    },
+    {
+      "folke/which-key.nvim",
+      lazy = true,
+      event = "BufReadPost",
+      keys = {
+        { "<leader>?", function() require("which-key").show({ global = false }) end, mode = { "n", "v" }, desc = "Buffer Local Keymap" }
+      },
+      config = function()
+        require("which-key").setup({
+          preset = "helix",
+        })
+      end,
+    },
+    {
       "windwp/nvim-autopairs",
       lazy = true,
       event = "InsertEnter",
       config = function()
         require("nvim-autopairs").setup({})
+      end,
+    },
+    {
+      "HiPhish/rainbow-delimiters.nvim",
+      lazy = true,
+      event = "InsertEnter",
+      config = function()
+        require('rainbow-delimiters.setup').setup({
+          strategy = {
+            [''] = 'rainbow-delimiters.strategy.global',
+            vim = 'rainbow-delimiters.strategy.local',
+          },
+          query = {
+            [''] = 'rainbow-delimiters',
+            lua = 'rainbow-blocks',
+          },
+          highlight = {
+            'RainbowDelimiterRed',
+            'RainbowDelimiterYellow',
+            'RainbowDelimiterBlue',
+            'RainbowDelimiterOrange',
+            'RainbowDelimiterGreen',
+            'RainbowDelimiterViolet',
+            'RainbowDelimiterCyan',
+          },
+        })
+        require("rainbow-delimiters").enable(0)
+      end,
+    },
+    {
+      "nvim-treesitter/nvim-treesitter",
+      lazy = true,
+      event = "BufReadPost",
+      dependencies = {
+        { "nvim-treesitter/nvim-treesitter-context" },
+      },
+      config = function()
+        local ok, ts = pcall(require, "nvim-treesitter.configs")
+        if ok then
+          ts.setup({
+            ensure_installed = {
+              "bash",
+              "c",
+              "cpp",
+              "lua",
+              "markdown",
+              "markdown_inline",
+              "python",
+              "vimdoc",
+            },
+            highlight = { enable = true },
+          })
+        end
+        require('treesitter-context').setup({
+          enable = true,
+          multiwindow = false,
+          max_lines = 0,
+          min_window_height = 0,
+          line_numbers = true,
+          multiline_threshold = 20,
+          trim_scope = 'outer',
+          mode = 'cursor',
+          separator = nil,
+          zindex = 20,
+          on_attach = nil,
+        })
+      end,
+    },
+    {
+      "ibhagwan/fzf-lua",
+      dependencies = { "nvim-tree/nvim-web-devicons" },
+      keys = {
+        { "<leader><leader>", function() vim.cmd("FzfLua commands") end, mode = { "n" }, desc = "Find commands" },
+        { "<leader>ff", function() vim.cmd("FzfLua files") end, mode = { "n" }, desc = "Find files" },
+        { "<leader>fb", function() vim.cmd("FzfLua buffers") end, mode = { "n" }, desc = "Find buffers" },
+        { "<leader>fr", function() vim.cmd("FzfLua oldfiles") end, mode = { "n" }, desc = "Find recent files" },
+        { "<leader>fs", function() vim.cmd("FzfLua blines") end, mode = { "n" }, desc = "Find buffer words" },
+        { "<leader>fS", function() vim.cmd("FzfLua lines") end, mode = { "n" }, desc = "Find all buffer words" },
+        { "<leader>fw", function() vim.cmd("FzfLua live_grep") end, mode = { "n" }, desc = "Find words" },
+        { "<leader>fc", function() vim.cmd("FzfLua colorschemes") end, mode = { "n" }, desc = "Find themes" },
+      },
+      config = function()
+        require("fzf-lua").setup({
+          winopts = {
+            height = 0.92,
+            width = 0.88,
+            border = "rounded",
+          },
+        })
+      end,
+    },
+    {
+      "j-hui/fidget.nvim",
+      lazy = true,
+      event = "LspAttach",
+      config = function()
+        require("fidget").setup({})
+      end,
+    },
+    {
+      "rachartier/tiny-inline-diagnostic.nvim",
+      event = "LspAttach",
+      config = function()
+        require("tiny-inline-diagnostic").setup({})
+        vim.diagnostic.config({ virtual_text = false })
+      end,
+    },
+    {
+      "williamboman/mason.nvim",
+      config = function()
+        require("mason").setup({
+          ui = {
+            width = 0.92,
+            height = 0.88,
+            border = "rounded",
+          },
+        })
+      end,
+    },
+    {
+      "williamboman/mason-lspconfig.nvim",
+      config = function()
+        local mason_lspconfig = require("mason-lspconfig")
+        local capabilities = require("cmp_nvim_lsp").default_capabilities()
+        local custom_server_configs = {
+          ["lua_ls"] = {
+            settings = {
+              Lua = {},
+            },
+          },
+        }
+        mason_lspconfig.setup({
+          ensure_installed = {
+            "lua_ls",
+          },
+          automatic_installation = true,
+          handlers = {
+            function(server_name)
+              local config = {
+                capabilities = capabilities,
+                single_file_support = true,
+              }
+              if custom_server_configs[server_name] then
+                config = vim.tbl_deep_extend("force", config, custom_server_configs[server_name])
+              end
+              vim.lsp.config(server_name, config)
+              vim.lsp.enable(server_name)
+            end,
+          },
+        })
+      end,
+    },
+    {
+      "neovim/nvim-lspconfig",
+      lazy = false,
+      dependencies = {
+        "hrsh7th/cmp-nvim-lsp",
+        "williamboman/mason.nvim",
+        "williamboman/mason-lspconfig.nvim",
+      },
+      config = function() end,
+    },
+    {
+      "hrsh7th/nvim-cmp",
+      lazy = false,
+      dependencies = {
+        "hrsh7th/cmp-nvim-lsp",
+        "hrsh7th/cmp-buffer",
+        "hrsh7th/cmp-path",
+        "hrsh7th/cmp-cmdline",
+        "neovim/nvim-lspconfig",
+        "L3MON4D3/LuaSnip",
+        "saadparwaiz1/cmp_luasnip",
+        "onsails/lspkind.nvim",
+        "rafamadriz/friendly-snippets",
+      },
+      config = function()
+        local cmp = require("cmp")
+        local lspkind = require("lspkind")
+        require("luasnip.loaders.from_lua").lazy_load()
+	require("luasnip.loaders.from_vscode").lazy_load()
+	require("luasnip.loaders.from_snipmate").lazy_load()
+        cmp.setup({
+          window = {
+            completion = {
+              border = "rounded",
+              winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
+            },
+            documentation = {
+              border = "rounded",
+              winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
+            },
+          },
+          sorting = {
+            priority_weight = 2,
+          },
+          formatting = {
+            fields = { "icon", "abbr", "kind", "menu" },
+            format = lspkind.cmp_format({
+              maxwidth = {
+                menu = 50,
+                abbr = 50,
+              },
+              ellipsis_char = '...',
+              show_labelDetails = true,
+              before = function (entry, vim_item)
+                return vim_item
+              end
+            })
+          },
+          snippet = {
+            expand = function(args)
+              require("luasnip").lsp_expand(args.body)
+            end,
+          },
+          matching = {
+            disallow_partial_fuzzy_matching = false,
+          },
+          performance = {
+            async_budget = 1,
+            max_view_entries = 120,
+          },
+          mapping = cmp.mapping.preset.insert({
+            ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+            ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
+            ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+            ["<C-f>"] = cmp.mapping.scroll_docs(4),
+            ["<C-g>"] = cmp.mapping.abort(),
+            ['<CR>'] = cmp.mapping.confirm({ select = true })
+          }),
+          sources = {
+            { name = "lazydev", group_index = 0 },
+            { name = "nvim_lsp", max_item_count = 350 },
+            { name = "luasnip" },
+            { name = "path" },
+            { name = "buffer" },
+          },
+          experimental = {
+            ghost_text = {
+              hl_group = "Whitespace",
+            },
+          },
+        })
+        cmp.setup.cmdline({ '/', '?' }, {
+          mapping = cmp.mapping.preset.cmdline(),
+          sources = {
+            { name = 'buffer' }
+          }
+        })
+        cmp.setup.cmdline(':', {
+          mapping = cmp.mapping.preset.cmdline(),
+          sources = cmp.config.sources({
+            { name = 'path' }
+          }, {
+            { name = 'cmdline' }
+          }),
+        })
       end,
     },
   }
@@ -315,17 +723,17 @@ local common_specs = {
         no_underline = false,
         styles = {
           comments = { "italic" },
-          conditionals = { "italic" },
+          conditionals = { "bold" },
           loops = { "bold" },
           functions = { "bold" },
-          keywords = { "bold" },
+          keywords = { "italic" },
           strings = {},
           variables = {},
           numbers = {},
-          booleans = {},
+          booleans = { "bold", "italic" },
           properties = {},
           types = {},
-          operators = {},
+          operators = { "bold" },
           miscs = {},
         },
         lsp_styles = {
@@ -360,8 +768,25 @@ local common_specs = {
         highlight_overrides = {},
         custom_highlights = function(colors)
           return {
+            NormalFloat = { fg = colors.text, bg = colors.mantle },
+            FloatBorder = {
+              fg = colors.blue,
+              bg = colors.mantle,
+            },
             Comment = { fg = colors.overlay1 },
             CursorLineNr = { fg = colors.green, style = { "bold" } },
+            Pmenu = { fg = colors.overlay2, bg = colors.base },
+            PmenuBorder = { fg = colors.surface1, bg = colors.base },
+            PmenuSel = { bg = colors.green, fg = colors.base },
+            CmpItemAbbr = { fg = colors.overlay2 },
+            CmpItemAbbrMatch = { fg = colors.blue, style = { "bold" } },
+            CmpDoc = { link = "NormalFloat" },
+            CmpDocBorder = {
+              fg = colors.surface1,
+              bg = colors.mantle,
+            },
+            ["@property"] = { fg = colors.text },
+            ["@keyword.return"] = { fg = colors.red, style = { "bold", "italic" } },
           }
         end,
         auto_integrations = true,
@@ -369,7 +794,6 @@ local common_specs = {
           aerial = false,
           alpha = false,
           artio = false,
-          barbar = false,
           barbar = false,
           barbecue = {
             dim_dirname = true,
@@ -379,7 +803,7 @@ local common_specs = {
           },
           beacon = false,
           blink_cmp = {
-            style = 'bordered',
+            style = "bordered",
           },
           blink_indent = false,
           blink_pairs = false,
@@ -414,7 +838,7 @@ local common_specs = {
           lightspeed = false,
           lir = {
             enabled = false,
-            git_status = false
+            git_status = false,
           },
           lsp_saga = false,
           markview = false,
@@ -456,14 +880,14 @@ local common_specs = {
           symbols_outline = true,
           telekasten = false,
           telescope = {
-            enabled = true,
+            enabled = false,
           },
           lsp_trouble = true,
           dadbod_ui = false,
           gitgutter = false,
           illuminate = {
             enabled = true,
-            lsp = false
+            lsp = false,
           },
           sandwich = false,
           signify = false,
@@ -474,6 +898,202 @@ local common_specs = {
       })
       vim.cmd.colorscheme("catppuccin")
     end,
+  },
+  {
+    "navarasu/onedark.nvim",
+    lazy = false,
+    enabled = profile == "self",
+    config = function()
+      require("onedark").setup({
+        style = "warmer",
+        transparent = false,
+        term_colors = true,
+        ending_tildes = false,
+        cmp_itemkind_reverse = false,
+        toggle_style_key = nil,
+        toggle_style_list = {'dark', 'darker', 'cool', 'deep', 'warm', 'warmer', 'light'},
+        code_style = {
+          comments = 'italic',
+          keywords = 'none',
+          functions = 'none',
+          strings = 'none',
+          variables = 'none'
+        },
+        lualine = {
+          transparent = false,
+        },
+        colors = {},
+        highlights = {},
+        diagnostics = {
+          darker = true,
+          undercurl = true,
+          background = true,
+        },
+      })
+      -- require("onedark").load()
+    end
+  },
+  {
+    "nyoom-engineering/oxocarbon.nvim",
+    lazy = false,
+    enabled = profile == "self",
+  },
+  {
+    "ellisonleao/gruvbox.nvim",
+    lazy = false,
+    enabled = profile == "self",
+    config = function()
+      require("gruvbox").setup({
+        terminal_colors = true,
+        undercurl = true,
+        underline = true,
+        bold = true,
+        italic = {
+          strings = true,
+          emphasis = true,
+          comments = true,
+          operators = false,
+          folds = true,
+        },
+        strikethrough = true,
+        invert_selection = false,
+        invert_signs = false,
+        invert_tabline = false,
+        inverse = true,
+        contrast = "",
+        palette_overrides = {},
+        overrides = {},
+        dim_inactive = false,
+        transparent_mode = false,
+      })
+      -- vim.cmd.colorscheme("gruvbox")
+    end,
+  },
+  {
+    "rebelot/kanagawa.nvim",
+    lazy = false,
+    enabled = profile == "self",
+    config = function()
+      require('kanagawa').setup({
+        compile = false,
+        undercurl = true,
+        commentStyle = { italic = true },
+        functionStyle = {},
+        keywordStyle = { italic = true},
+        statementStyle = { bold = true },
+        typeStyle = {},
+        transparent = false,
+        dimInactive = false,
+        terminalColors = true,
+        colors = {
+          palette = {},
+          theme = { wave = {}, lotus = {}, dragon = {}, all = {} },
+        },
+        overrides = function(colors)
+          return {}
+        end,
+        theme = "wave",
+        background = {
+          dark = "dragon",
+          light = "lotus"
+        },
+      })
+      -- vim.cmd.colorscheme("kanagawa")
+    end,
+  },
+  {
+    "EdenEast/nightfox.nvim",
+    lazy = false,
+    enabled = profile == "self",
+    config = function()
+      require('nightfox').setup({
+        options = {
+          compile_path = vim.fn.stdpath("cache") .. "/nightfox",
+          compile_file_suffix = "_compiled",
+          transparent = false,
+          terminal_colors = true,
+          dim_inactive = false,
+          module_default = true,
+          colorblind = {
+            enable = false,
+            simulate_only = false,
+            severity = {
+              protan = 0,
+              deutan = 0,
+              tritan = 0,
+            },
+          },
+          styles = {
+            comments = "italic",
+            conditionals = "NONE",
+            constants = "NONE",
+            functions = "bold",
+            keywords = "bold",
+            numbers = "NONE",
+            operators = "NONE",
+            strings = "NONE",
+            types = "italic,bold",
+            variables = "NONE",
+          },
+          inverse = {
+            match_paren = false,
+            visual = false,
+            search = false,
+          },
+          modules = {},
+        },
+        palettes = {},
+        specs = {},
+        groups = {},
+      })
+      -- vim.cmd.colorscheme("nordfox")
+    end,
+  },
+  {
+    "AlexvZyl/nordic.nvim",
+    lazy = false,
+    enabled = profile == "self",
+    config = function()
+      require('nordic').setup({
+        on_palette = function(palette) end,
+        after_palette = function(palette) end,
+        on_highlight = function(highlights, palette) end,
+        bold_keywords = false,
+        italic_comments = true,
+        transparent = {
+          bg = false,
+          float = false,
+        },
+        bright_border = true,
+        reduced_blue = true,
+        swap_backgrounds = false,
+        cursorline = {
+          bold = false,
+          bold_number = true,
+          theme = 'dark',
+          blend = 0.85,
+        },
+        visual = {
+          bold = true,
+          bold_number = true,
+          theme = 'dark',
+          blend = 0.85,
+        },
+        noice = {
+          style = 'classic',
+        },
+        telescope = {
+          style = 'flat',
+        },
+        leap = {
+          dim_backdrop = false,
+        },
+        ts_context = {
+          dark_background = true,
+        }
+      })
+      -- require('nordic').load()
+    end
   },
 }
 for _, spec in ipairs(common_specs) do
@@ -547,19 +1167,19 @@ local function bootstrap_manager(name, specs_tbl)
 
   -- mini
   if ({ mini = true })[name] then
-    local path_package = vim.fn.stdpath('data') .. '/site'
-    local mini_path = path_package .. '/pack/deps/start/mini.nvim'
+    local path_package = vim.fn.stdpath("data") .. "/site"
+    local mini_path = path_package .. "/pack/deps/start/mini.nvim"
     if not vim.loop.fs_stat(mini_path) then
       vim.cmd('echo "Installing `mini.nvim`" | redraw')
       local clone_cmd = {
-        'git',
-        'clone',
-        '--filter=blob:none',
-        'https://github.com/nvim-mini/mini.nvim',
-        mini_path
+        "git",
+        "clone",
+        "--filter=blob:none",
+        "https://github.com/nvim-mini/mini.nvim",
+        mini_path,
       }
       vim.fn.system(clone_cmd)
-      vim.cmd('packadd mini.nvim | helptags ALL')
+      vim.cmd("packadd mini.nvim | helptags ALL")
       vim.cmd('echo "Installed `mini.nvim`" | redraw')
     end
     local mini = require("mini.deps")
@@ -586,6 +1206,7 @@ local function bootstrap_manager(name, specs_tbl)
       end
       return repo
     end
+    -- 用`zpack.nvim`提供類似lazy的管理介面
     vim.pack.add({ gh("zuqini/zpack.nvim") })
     local ok, zpack = pcall(require, "zpack")
     if ok then
