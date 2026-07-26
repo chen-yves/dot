@@ -360,8 +360,9 @@
     "ww" 'ace-window
     "wd" 'delete-other-windows
     "wD" 'delete-window
-    "tm" 'dired-sidebar-toggle-sidebar
+    "tn" 'dired-sidebar-toggle-sidebar
     "tv" 'vundo
+    "tm" 'minimap-mode
     "hd" 'helpful-at-point
     "hf" 'helpful-callable
     "hv" 'helpful-variable
@@ -673,6 +674,13 @@
    ("M-R" . symbol-overlay-remove-all))
   :config
   (setq symbol-overlay-idle-time 0.3))
+
+(use-package minimap
+  :commands minimap-mode
+  :config
+  (setq minimap-update-delay 0.24)
+  (setq minimap-width-fraction 0.16)
+  (setq minimap-window-location 'right))
 
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
