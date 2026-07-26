@@ -1,21 +1,22 @@
 ;;; init.el --- My Emacs Configuration. -*- lexical-binding: t no-byte-compile: t -*-
 ;;; Commentary:
 
-;; References:
-;; https://github.com/seagle0128/.emacs.d
-;; https://github.com/redguardtoo/emacs.d
-;; https://github.com/manateelazycat/lazycat-emacs
-;; https://github.com/MiniApollo/kickstart.emacs
-;; https://github.com/daviwil/emacs-from-scratch
-;; https://github.com/purcell/emacs.d
-;; https://github.com/syl20bnr/spacemacs
-;; https://github.com/doomemacs/core
-;; https://github.com/bbatsov/prelude
-;; https://github.com/Eason0210/.emacs.d
-;; https://github.com/jamescherti/minimal-emacs.d
+;;;; Inspirations:
+;;;; - https://github.com/seagle0128/.emacs.d
+;;;; - https://github.com/redguardtoo/emacs.d
+;;;; - https://github.com/manateelazycat/lazycat-emacs
+;;;; - https://github.com/MiniApollo/kickstart.emacs
+;;;; - https://github.com/daviwil/emacs-from-scratch
+;;;; - https://github.com/purcell/emacs.d
+;;;; - https://github.com/syl20bnr/spacemacs
+;;;; - https://github.com/doomemacs/core
+;;;; - https://github.com/bbatsov/prelude
+;;;; - https://github.com/Eason0210/.emacs.d
+;;;; - https://github.com/jamescherti/minimal-emacs.d
 
 ;;; Code:
 
+;;;; CORE
 (use-package use-package
   :ensure nil
   :custom
@@ -60,7 +61,7 @@
                when (find-font (font-spec :name font))
                return (set-face-attribute 'default nil
                                           :family font
-                                          :height (cond ((eq system-type 'darwin) 140)
+                                          :height (cond ((eq system-type 'darwin) 130)
                                                         ((eq system-type 'windows-nt) 100)
                                                         (t 100))))
 
@@ -125,6 +126,13 @@
   (setq-default create-lockfiles nil)
   (setq-default truncate-lines t))
 
+(use-package outline
+  :ensure nil
+  :hook (emacs-lisp-mode . outline-minor-mode)
+  :config
+  (setq outline-minor-mode-cycle t)
+  (setq outline-minor-mode-highlight t))
+
 (use-package syntax
   :ensure nil
   :config
@@ -185,7 +193,7 @@
   :hook
   (prog-mode . electric-pair-mode))
 
-(use-package display-line-numbers-mode
+(use-package display-line-numbers
   :ensure nil
   :hook
   (prog-mode . display-line-numbers-mode))
@@ -203,7 +211,7 @@
 
 (use-package saveplace
   :ensure nil
-  :hook (prog-mode . save-place-mode))
+  :hook (after-init . save-place-mode))
 
 (use-package recentf
   :ensure nil
@@ -260,6 +268,7 @@
   (setq dired-create-destination-dirs 'ask)
   (setq image-dired-thumb-size 150))
 
+;;;; EVIL
 (use-package evil
   :hook (after-init . evil-mode)
   :init
@@ -359,6 +368,7 @@
     "hx" 'helpful-command
     "hk" 'helpful-key))
 
+;;;; UI
 (use-package catppuccin-theme)
 (use-package zenburn-theme)
 (use-package nord-theme)
@@ -479,6 +489,17 @@
 (use-package diredfl
   :hook (dired-mode . diredfl-mode))
 
+(use-package diff-hl
+  :hook
+  ((after-init . global-diff-hl-mode)
+   (after-init . global-diff-hl-show-hunk-mouse-mode)
+   (dired-mode . diff-hl-dired-mode))
+  :config
+  (setq diff-hl-draw-borders nil)
+  (setq diff-hl-update-async t)
+  (setq diff-hl-global-modes '(not image-mode pdf-view-mode)))
+
+;;;; WINDOW
 (use-package winum
   :hook (after-init . winum-mode))
 
@@ -538,37 +559,7 @@
           "\\*docker-.+\\*" "\\*prolog\\*" "\\*rustfmt\\*$"
           inferior-python-mode inf-ruby-mode swift-repl-mode)))
 
-(use-package hl-todo
-  :hook (prog-mode . global-hl-todo-mode)
-  :config
-  (setq hl-todo-highlight-punctuation ":")
-  (setq hl-todo-text-modes nil)
-  (setq hl-todo-keyword-faces '(("TODO" warning bold)
-                                ("FIXME" error bold)
-                                ("REVIEW" font-lock-keyword-face bold)
-                                ("HACK" font-lock-constant-face bold)
-                                ("DEPRECATED" font-lock-doc-face bold)
-                                ("BUG" error bold)
-                                ("XXX" font-lock-constant-face bold)
-                                ("NOTE" success bold))))
-
-(use-package symbol-overlay
-  :hook
-  ((prog-mode yaml-mode yaml-ts-mode) . symbol-overlay-mode)
-  :bind
-  (("M-i" . symbol-overlay-input)
-   ("M-N" . symbol-overlay-jump-next)
-   ("M-P" . symbol-overlay-jump-prev)
-   ("M-R" . symbol-overlay-remove-all))
-  :config
-  (setq symbol-overlay-idle-time 0.3))
-
-(use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
-
-(use-package colorful-mode
-  :hook (prog-mode . colorful-mode))
-
+;;;; COMPLETION
 (use-package ivy
   :hook (after-init . ivy-mode)
   :config
@@ -649,12 +640,45 @@
   (setq company-box-backends-colors nil)
   (setq company-box-tooltip-limit 50))
 
+;;;; Snippets
 (use-package yasnippet
   :hook (prog-mode . yas-minor-mode)
   :config
   (yas-reload-all))
 
 (use-package yasnippet-snippets)
+
+;;;; TOOL
+(use-package hl-todo
+  :hook (prog-mode . hl-todo-mode)
+  :config
+  (setq hl-todo-highlight-punctuation ":")
+  (setq hl-todo-text-modes nil)
+  (setq hl-todo-keyword-faces '(("TODO" warning bold)
+                                ("FIXME" error bold)
+                                ("REVIEW" font-lock-keyword-face bold)
+                                ("HACK" font-lock-constant-face bold)
+                                ("DEPRECATED" font-lock-doc-face bold)
+                                ("BUG" error bold)
+                                ("XXX" font-lock-constant-face bold)
+                                ("NOTE" success bold))))
+
+(use-package symbol-overlay
+  :hook
+  ((prog-mode yaml-mode yaml-ts-mode) . symbol-overlay-mode)
+  :bind
+  (("M-i" . symbol-overlay-input)
+   ("M-N" . symbol-overlay-jump-next)
+   ("M-P" . symbol-overlay-jump-prev)
+   ("M-R" . symbol-overlay-remove-all))
+  :config
+  (setq symbol-overlay-idle-time 0.3))
+
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+(use-package colorful-mode
+  :hook (prog-mode . colorful-mode))
 
 (use-package helpful
   :bind
@@ -663,16 +687,6 @@
    ("C-h x" . helpful-command)
    ("C-h k" . helpful-key)
    ("C-h C-d" . helpful-at-point)))
-
-(use-package diff-hl
-  :hook
-  ((after-init . global-diff-hl-mode)
-   (after-init . global-diff-hl-show-hunk-mouse-mode)
-   (dired-mode . diff-hl-dired-mode))
-  :config
-  (setq diff-hl-draw-borders nil)
-  (setq diff-hl-update-async t)
-  (setq diff-hl-global-modes '(not image-mode pdf-view-mode)))
 
 (use-package dired-sidebar
   :commands dired-sidebar-toggle-sidebar
@@ -713,9 +727,20 @@
 (use-package xclip
   :hook (after-init . xclip-mode))
 
+(use-package gcmh
+  :hook (after-init . gcmh-mode))
+
+(use-package exec-path-from-shell
+  :when (memq window-system '(mac ns x))
+  :defer 5
+  :config
+  (exec-path-from-shell-initialize))
+
+;;;; VC
 (use-package magit
   :commands magit-status)
 
+;;;; LANGUAGE
 (use-package lua-mode
   :mode "\\.lua\\'"
   :config
@@ -736,7 +761,12 @@
   :mode "\\.go\\'")
 
 (use-package markdown-mode
-  :mode "\\.md\\'")
+  :mode "\\.md\\'"
+  :config
+  (setq markdown-fontify-code-blocks-natively t)
+  (setq markdown-enable-math t)
+  (setq markdown-hide-markup nil)
+  (setq markdown-command "pandoc"))
 
 (use-package web-mode
   :mode "\\.p?html\\'")
@@ -797,8 +827,9 @@
 (use-package jinja2-mode)
 (use-package git-modes)
 
+;;;; SYNTAX
 (use-package flycheck
-  :hook (prog-mode . global-flycheck-mode)
+  :hook (prog-mode . flycheck-mode)
   :bind
   (("M-n" . flycheck-next-error)
    ("M-p" . flycheck-previous-error))
@@ -809,13 +840,15 @@
   (setq flycheck-display-errors-delay 0.24))
 
 (use-package flycheck-popup-tip
-  :hook (global-flycheck-mode . flycheck-popup-tip-mode)
+  :hook (flycheck-mode . flycheck-popup-tip-mode)
   :config
   (setq flycheck-popup-tip-error-prefix "[!] "))
 
+;;;; FORMAT
 (use-package apheleia
   :hook (prog-mode . apheleia-mode))
 
+;;;; WORKSPACE
 (use-package projectile
   :hook (after-init . projectile-mode)
   :bind
@@ -845,6 +878,7 @@
                                              (persp-mode-projectile-bridge-find-perspectives-for-all-buffers)
                                            (persp-mode-projectile-bridge-kill-perspectives)))))
 
+;;;; LSP & DAP
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
   :init
@@ -859,7 +893,7 @@
   (setq lsp-signature-auto-activate nil)
   (setq lsp-enable-folding nil)
   (setq lsp-enable-text-document-color nil)
-  (setq lsp-enable-file-watchers t)
+  (setq lsp-enable-file-watchers nil)
   (setq lsp-file-watch-threshold 2000)
   (setq lsp-semantic-tokens-enable 'deferred))
 
@@ -888,20 +922,18 @@
   (dap-auto-configure-features '(sessions locals controls tooltip))
   (setq dap-auto-show-output nil))
 
+(use-package dape
+  :commands dape
+  :config
+  (setq dape-buffer-window-arrangement 'right))
+
 (use-package mason
   :when (not (eq system-type 'windows-nt))
   :hook (prog-mode . (lambda ()
                        (require 'mason)
                        (mason-setup))))
 
-(use-package dape
-  :commands dape
-  :config
-  (setq dape-buffer-window-arrangement 'right))
-
-(use-package gcmh
-  :hook (after-init . gcmh-mode))
-
+;;;; TERMINAL
 (use-package ghostel
   :when (not (eq system-type 'windows-nt))
   :commands ghostel)
@@ -912,11 +944,5 @@
 
 (use-package eshell-syntax-highlighting
   :hook (eshell-mode . eshell-syntax-highlighting-mode))
-
-(use-package exec-path-from-shell
-  :when (memq window-system '(mac ns x))
-  :defer 5
-  :config
-  (exec-path-from-shell-initialize))
 
 ;;; init.el ends here
