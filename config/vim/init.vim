@@ -41,9 +41,9 @@ set history=1000
 set clipboard^=unnamed,unnamedplus
 syntax on
 filetype plugin indent on
-set undofile
-set backup
-set swapfile
+set noundofile
+set nobackup
+set noswapfile
 set timeout
 set timeoutlen=300
 set hidden
