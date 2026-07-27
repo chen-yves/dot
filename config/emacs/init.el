@@ -29,9 +29,9 @@
   :ensure nil
   :init
   (setq package-enable-at-startup nil)
+  (setq package-quickstart t)
   :config
   (package-initialize)
-  (setq package-quickstart t)
   (setq package-archives
         '(("gnu" . "https://elpa.gnu.org/packages/")
           ("nongnu" . "https://elpa.nongnu.org/nongnu/")
@@ -120,6 +120,13 @@
   (setq inhibit-compacting-font-caches t)
   (setq auto-window-vscroll nil)
   (setq bidi-inhibit-bpa t)
+  (setq hscroll-step 1)
+  (setq hscroll-margin 2)
+  (setq scroll-step 1)
+  (setq scroll-margin 0)
+  (setq scroll-conservatively 100000)
+  (setq scroll-preserve-screen-position t)
+  (setq auto-window-vscroll nil)
   (setq-default bidi-display-reordering nil)
   (setq-default bidi-paragraph-direction 'left-to-right)
   (setq-default tab-width 2)
@@ -264,9 +271,7 @@
   (setq dired-dwim-target t)
   (setq dired-auto-revert-buffer #'dired-buffer-stale-p)
   (setq dired-recursive-copies 'always)
-  (setq dired-recursive-deletes 'top)
-  (setq dired-create-destination-dirs 'ask)
-  (setq image-dired-thumb-size 150))
+  (setq dired-recursive-deletes 'top))
 
 ;;;; EVIL
 (use-package evil
@@ -276,10 +281,10 @@
   (setq evil-want-keybinding nil)
   :config
   (evil-ex-define-cmd "q" 'kill-current-buffer)
-  (evil-ex-define-cmd "wq" #'(lambda ()
-                               (interactive)
-                               (save-buffer)
-                               (kill-buffer-and-window))))
+  (evil-ex-define-cmd "wq" (lambda ()
+                             (interactive)
+                             (save-buffer)
+                             (kill-buffer-and-window))))
 
 (use-package evil-collection
   :hook (evil-mode . evil-collection-init))
@@ -417,9 +422,8 @@
                           (registers . 5))))
 
 (use-package solaire-mode
-  :defer 5
-  :config
-  (solaire-global-mode))
+  :hook
+  (after-init . solaire-global-mode))
 
 (use-package doom-modeline
   :hook (after-init . doom-modeline-mode)
@@ -460,7 +464,9 @@
   :hook (emacs-lisp-mode . highlight-defined-mode))
 
 (use-package indent-bars
-  :hook ((prog-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
+  :hook
+  ((prog-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
+  (emacs-lisp-mode . (lambda () (indent-bars-mode -1)))
   :config
   (setq indent-bars-display-on-blank-lines nil)
   (setq indent-bars-color '(font-lock-comment-face :face-bg nil :blend 0.4))
@@ -470,7 +476,8 @@
   (setq indent-bars-pad-frac 0.1)
   (setq indent-bars-color-by-depth nil)
   (setq indent-bars-no-descend-string t)
-  (setq indent-bars-prefer-character t))
+  (setq indent-bars-prefer-character t)
+  (setq indent-bars-no-stipple-char ?│))
 
 (use-package breadcrumb
   :hook (prog-mode . breadcrumb-local-mode))
@@ -560,10 +567,30 @@
           "\\*docker-.+\\*" "\\*prolog\\*" "\\*rustfmt\\*$"
           inferior-python-mode inf-ruby-mode swift-repl-mode)))
 
+(use-package ligature
+  :hook (after-init . global-ligature-mode)
+  :config
+  (ligature-set-ligatures 't '("www"))
+  (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
+  (ligature-set-ligatures 'prog-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+                                       ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+                                       "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
+                                       "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
+                                       "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
+                                       "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
+                                       "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
+                                       "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
+                                       ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
+                                       "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
+                                       "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
+                                       "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
+                                       "\\\\" "://")))
+
 ;;;; COMPLETION
 (use-package ivy
   :hook (after-init . ivy-mode)
   :config
+  (setq ivy-dynamic-exhibit-delay-ms 250)
   (setq ivy-height 17)
   (setq ivy-wrap t)
   (setq ivy-fix-height-minibuffer t)
@@ -577,12 +604,15 @@
   (setq ivy-re-builders-alist
         `((t . ivy--regex-ignore-order)))
   (setq ivy-more-chars-alist
-        '((counsel-rg . 1)
+        '((counsel-rg . 2)
           (counsel-search . 2)
           (t . 3))))
 
 (use-package ivy-rich
   :hook (ivy-mode . ivy-rich-mode))
+
+(use-package counsel-etags
+  :commands counsel-etags-grep)
 
 (use-package nerd-icons-ivy-rich
   :hook (ivy-mode . nerd-icons-ivy-rich-mode))
@@ -744,9 +774,16 @@
   :config
   (exec-path-from-shell-initialize))
 
+(use-package find-file-in-project
+  :commands project-find-file)
+
 ;;;; VC
 (use-package magit
-  :commands magit-status)
+  :commands magit-status
+  :config
+  (when (eq system-type 'windows-nt)
+    (setq magit-commit-show-diff nil)
+    (setq magit-diff-refine-hunk nil)))
 
 ;;;; LANGUAGE
 (use-package lua-mode
@@ -757,7 +794,9 @@
   (setq lua-indent-close-paren-align nil))
 
 (use-package csv-mode
-  :mode "\\.[cq]sv\\'")
+  :mode "\\.[cq]sv\\'"
+  :config
+  (setq csv-separators '("," ";" "|" " ")))
 
 (use-package clojure-mode
   :mode "\\.clj\\'")
@@ -806,13 +845,30 @@
 (use-package vue-mode
   :mode "\\.vue\\'")
 
-(use-package powershell)
-(use-package dotenv-mode)
+(use-package powershell
+  :mode "\\.ps1\\'")
+
+(use-package dotenv-mode
+  :mode "\\.env\\'")
+
+(use-package nginx-mode
+  :mode "/nginx/.*\\.conf\\'")
+
+(use-package php-mode
+  :mode "\\.php\\'")
+
+(use-package elixir-mode
+  :mode "\\.exs?\\'")
+
+(use-package scala-mode
+  :mode "\\.s\\(cala\\|bt\\)\\'")
+
+(use-package uv-mode
+  :commands uv-mode-auto-activate-hook
+  :hook ((python-mode python-ts-mode) . uv-mode-auto-activate-hook))
+
 (use-package slime)
-(use-package nginx-mode)
 (use-package vimrc-mode)
-(use-package php-mode)
-(use-package elixir-mode)
 (use-package vala-mode)
 (use-package toml-mode)
 (use-package emmet-mode)
@@ -826,7 +882,6 @@
 (use-package erlang)
 (use-package ess)
 (use-package rjsx-mode)
-(use-package scala-mode)
 (use-package dart-mode)
 (use-package swift-mode)
 (use-package kotlin-mode)
@@ -905,6 +960,12 @@
   (setq lsp-file-watch-threshold 2000)
   (setq lsp-semantic-tokens-enable 'deferred))
 
+(use-package lsp-pyright
+  :hook
+  ((python-mode python-ts-mode) . (lambda ()
+                                    (require 'lsp-pyright)
+                                    (setq lsp-pyright-langserver-command "basedpyright"))))
+
 (use-package lsp-ui
   :commands lsp-ui-mode
   :after lsp-mode
@@ -927,7 +988,7 @@
   :commands (dap-debug dap-debug-edit-template)
   :after lsp-mode
   :config
-  (dap-auto-configure-features '(sessions locals controls tooltip))
+  (setq dap-auto-configure-features '(sessions locals controls tooltip))
   (setq dap-auto-show-output nil))
 
 (use-package dape
