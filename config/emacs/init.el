@@ -114,6 +114,7 @@
   (window-setup . my/setup-fonts)
   (server-after-make-frame . my/setup-fonts)
   :config
+  (setq default-text-properties '(line-spacing 0.3 line-height 1.15))
   (setq fast-but-imprecise-scrolling t)
   (setq long-line-threshold 1000)
   (setq large-hscroll-threshold 1000)
@@ -255,7 +256,10 @@
 
 (use-package which-key
   :ensure nil
-  :hook (after-init . which-key-mode))
+  :hook (after-init . which-key-mode)
+  :config
+  (setq which-key-idle-delay 0.3)
+  (setq which-key-show-docstrings t))
 
 (use-package ibuffer
   :ensure nil
@@ -272,6 +276,16 @@
   (setq dired-auto-revert-buffer #'dired-buffer-stale-p)
   (setq dired-recursive-copies 'always)
   (setq dired-recursive-deletes 'top))
+
+(use-package flymake
+  :ensure nil
+  :config
+  (setq flymake-no-changes-timeout 1.0))
+
+(use-package eglot
+  :ensure nil
+  :config
+  (setq eglot-events-buffer-size 0))
 
 ;;;; EVIL
 (use-package evil
@@ -375,22 +389,22 @@
     "hk" 'helpful-key))
 
 ;;;; UI
-(use-package catppuccin-theme)
-(use-package zenburn-theme)
-(use-package nord-theme)
-(use-package nordic-night-theme)
-(use-package spacemacs-theme)
-(use-package gruvbox-theme)
-(use-package ayu-theme)
-(use-package seoul256-theme)
-(use-package material-theme)
-(use-package atom-one-dark-theme)
-(use-package ef-themes)
-(use-package kanagawa-themes)
-(use-package standard-themes)
-(use-package color-theme-sanityinc-tomorrow)
-(use-package color-theme-sanityinc-solarized)
 
+;; (use-package catppuccin-theme)
+;; (use-package zenburn-theme)
+;; (use-package nord-theme)
+;; (use-package nordic-night-theme)
+;; (use-package spacemacs-theme)
+;; (use-package gruvbox-theme)
+;; (use-package ayu-theme)
+;; (use-package seoul256-theme)
+;; (use-package material-theme)
+;; (use-package atom-one-dark-theme)
+;; (use-package ef-themes)
+;; (use-package kanagawa-themes)
+;; (use-package standard-themes)
+;; (use-package color-theme-sanityinc-tomorrow)
+;; (use-package color-theme-sanityinc-solarized)
 (use-package doom-themes
   :hook (after-init . (lambda () (load-theme 'doom-one t))))
 
@@ -766,9 +780,12 @@
   :hook (after-init . xclip-mode))
 
 (use-package gcmh
-  :hook (after-init . gcmh-mode))
+  :hook (after-init . gcmh-mode)
+  :config
+  (setq gcmh-verbose t))
 
 (use-package exec-path-from-shell
+  :ensure (memq window-system '(mac ns x))
   :when (memq window-system '(mac ns x))
   :defer 5
   :config
@@ -776,6 +793,42 @@
 
 (use-package find-file-in-project
   :commands project-find-file)
+
+(use-package olivetti
+  :commands olivetti-mode
+  :config
+  (setq olivetti-body-width 60)
+  (setq olivetti-style 'fancy)
+  (setq olivetti-margin-width 5))
+
+(use-package pretty-hydra
+  :bind
+  (("C-c w" . hydra-window/body)
+   ("C-c z" . hydra-text-scale/body))
+  :config
+  (pretty-hydra-define hydra-window
+    (:hint nil :color amaranth :quit-key "q" :title "Window Management")
+    ("Move"
+     (("h" windmove-left "←")
+      ("j" windmove-down "↓")
+      ("k" windmove-up "↑")
+      ("l" windmove-right "→"))
+     "Split & Close"
+     (("s" split-window-below "horizontal")
+      ("v" split-window-right "vertical")
+      ("d" delete-window "close current window" :color blue)
+      ("o" delete-other-windows "close other windows" :color blue))
+     "Resize"
+     (("=" enlarge-window "larger")
+      ("-" shrink-window "smaller")
+      (">" enlarge-window-horizontally "wider")
+      ("<" shrink-window-horizontally "shrink"))))
+  (pretty-hydra-define hydra-text-scale
+    (:hint nil :color amaranth :quit-key "q" :title "Text Scale")
+    ("Text Scale"
+     (("=" text-scale-increase "larger")
+      ("-" text-scale-decrease "smaller")
+      ("0" (lambda () (interactive) (text-scale-increase 0)) "reset" :color blue)))))
 
 ;;;; VC
 (use-package magit
@@ -867,28 +920,28 @@
   :commands uv-mode-auto-activate-hook
   :hook ((python-mode python-ts-mode) . uv-mode-auto-activate-hook))
 
-(use-package slime)
 (use-package vimrc-mode)
-(use-package vala-mode)
 (use-package toml-mode)
 (use-package emmet-mode)
-(use-package janet-mode)
 (use-package angular-mode)
 (use-package scss-mode)
 (use-package sass-mode)
 (use-package mmm-mode)
-(use-package groovy-mode)
 (use-package polymode)
-(use-package erlang)
 (use-package ess)
 (use-package rjsx-mode)
-(use-package dart-mode)
-(use-package swift-mode)
-(use-package kotlin-mode)
-(use-package matlab-mode)
 (use-package pandoc-mode)
-(use-package jinja2-mode)
 (use-package git-modes)
+;; (use-package erlang)
+;; (use-package groovy-mode)
+;; (use-package janet-mode)
+;; (use-package vala-mode)
+;; (use-package slime)
+;; (use-package matlab-mode)
+;; (use-package dart-mode)
+;; (use-package swift-mode)
+;; (use-package kotlin-mode)
+;; (use-package jinja2-mode)
 
 ;;;; SYNTAX
 (use-package flycheck
@@ -969,8 +1022,9 @@
 (use-package lsp-ui
   :commands lsp-ui-mode
   :after lsp-mode
-  :bind (:map lsp-mode-map
-              ("C-c l d" . lsp-ui-doc-glance))
+  :bind
+  (:map lsp-mode-map
+        ("C-c l d" . lsp-ui-doc-glance))
   :config
   (setq lsp-ui-doc-enable nil)
   (setq lsp-ui-doc-show-with-cursor nil)
@@ -997,6 +1051,7 @@
   (setq dape-buffer-window-arrangement 'right))
 
 (use-package mason
+  :ensure (not (eq system-type 'windows-nt))
   :when (not (eq system-type 'windows-nt))
   :hook (prog-mode . (lambda ()
                        (require 'mason)
@@ -1004,10 +1059,12 @@
 
 ;;;; TERMINAL
 (use-package ghostel
+  :ensure (not (eq system-type 'windows-nt))
   :when (not (eq system-type 'windows-nt))
   :commands ghostel)
 
 (use-package eat
+  :ensure (not (eq system-type 'windows-nt))
   :when (not (eq system-type 'windows-nt))
   :commands eat)
 
