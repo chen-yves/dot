@@ -316,6 +316,9 @@ autocmd! User vim-which-key call which_key#register('<Space>', 'g:which_key_map'
 nnoremap <silent> <leader> :<C-u>WhichKey '<Space>'<CR>
 nnoremap <silent> <localleader> :<C-u>WhichKey  ','<CR>
 
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries', 'for': ['go'] }
+
 " COMPLETION
 Plug 'prabirshrestha/vim-lsp', { 'on': [] }
 Plug 'prabirshrestha/asyncomplete.vim', { 'on': [] }
