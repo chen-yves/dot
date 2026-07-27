@@ -114,12 +114,11 @@
   (window-setup . my/setup-fonts)
   (server-after-make-frame . my/setup-fonts)
   :config
-  (setq default-text-properties '(line-spacing 0.3 line-height 1.15))
+  ;; (setq default-text-properties '(line-spacing 0.3 line-height 1.15))
   (setq fast-but-imprecise-scrolling t)
   (setq long-line-threshold 1000)
   (setq large-hscroll-threshold 1000)
   (setq inhibit-compacting-font-caches t)
-  (setq auto-window-vscroll nil)
   (setq bidi-inhibit-bpa t)
   (setq hscroll-step 1)
   (setq hscroll-margin 2)
@@ -379,6 +378,7 @@
     "ww" 'ace-window
     "wd" 'delete-other-windows
     "wD" 'delete-window
+    "wm" 'toggle-frame-maximized
     "tn" 'dired-sidebar-toggle-sidebar
     "tv" 'vundo
     "tm" 'minimap-mode
@@ -390,21 +390,21 @@
 
 ;;;; UI
 
-;; (use-package catppuccin-theme)
-;; (use-package zenburn-theme)
-;; (use-package nord-theme)
-;; (use-package nordic-night-theme)
-;; (use-package spacemacs-theme)
-;; (use-package gruvbox-theme)
-;; (use-package ayu-theme)
-;; (use-package seoul256-theme)
-;; (use-package material-theme)
-;; (use-package atom-one-dark-theme)
-;; (use-package ef-themes)
-;; (use-package kanagawa-themes)
-;; (use-package standard-themes)
-;; (use-package color-theme-sanityinc-tomorrow)
-;; (use-package color-theme-sanityinc-solarized)
+(use-package catppuccin-theme)
+(use-package zenburn-theme)
+(use-package nord-theme)
+(use-package nordic-night-theme)
+(use-package spacemacs-theme)
+(use-package gruvbox-theme)
+(use-package ayu-theme)
+(use-package seoul256-theme)
+(use-package material-theme)
+(use-package atom-one-dark-theme)
+(use-package ef-themes)
+(use-package kanagawa-themes)
+(use-package standard-themes)
+(use-package color-theme-sanityinc-tomorrow)
+(use-package color-theme-sanityinc-solarized)
 (use-package doom-themes
   :hook (after-init . (lambda () (load-theme 'doom-one t))))
 
@@ -785,7 +785,6 @@
   (setq gcmh-verbose t))
 
 (use-package exec-path-from-shell
-  :ensure (memq window-system '(mac ns x))
   :when (memq window-system '(mac ns x))
   :defer 5
   :config
@@ -932,16 +931,16 @@
 (use-package rjsx-mode)
 (use-package pandoc-mode)
 (use-package git-modes)
-;; (use-package erlang)
-;; (use-package groovy-mode)
-;; (use-package janet-mode)
-;; (use-package vala-mode)
-;; (use-package slime)
-;; (use-package matlab-mode)
-;; (use-package dart-mode)
-;; (use-package swift-mode)
-;; (use-package kotlin-mode)
-;; (use-package jinja2-mode)
+(use-package erlang)
+(use-package groovy-mode)
+(use-package janet-mode)
+(use-package vala-mode)
+(use-package slime)
+(use-package matlab-mode)
+(use-package dart-mode)
+(use-package swift-mode)
+(use-package kotlin-mode)
+(use-package jinja2-mode)
 
 ;;;; SYNTAX
 (use-package flycheck
@@ -960,7 +959,7 @@
   :config
   (setq flycheck-popup-tip-error-prefix "[!] "))
 
-;;;; FORMAT
+;;;; FORMATTER
 (use-package apheleia
   :hook (prog-mode . apheleia-mode))
 
@@ -1051,7 +1050,6 @@
   (setq dape-buffer-window-arrangement 'right))
 
 (use-package mason
-  :ensure (not (eq system-type 'windows-nt))
   :when (not (eq system-type 'windows-nt))
   :hook (prog-mode . (lambda ()
                        (require 'mason)
@@ -1059,12 +1057,10 @@
 
 ;;;; TERMINAL
 (use-package ghostel
-  :ensure (not (eq system-type 'windows-nt))
   :when (not (eq system-type 'windows-nt))
   :commands ghostel)
 
 (use-package eat
-  :ensure (not (eq system-type 'windows-nt))
   :when (not (eq system-type 'windows-nt))
   :commands eat)
 
