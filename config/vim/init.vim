@@ -41,6 +41,7 @@ set history=1000
 set clipboard^=unnamed,unnamedplus
 syntax on
 filetype plugin indent on
+set lazyredraw
 set noundofile
 set nobackup
 set noswapfile
