@@ -6,7 +6,7 @@
 (setq load-prefer-newer t)
 (setq gc-cons-percentage 1.0)
 (setq gc-cons-threshold most-positive-fixnum)
-(setq read-process-output-max #x10000)
+(setq read-process-output-max (* 3 1024 1024))
 (setq native-comp-async-report-warnings-errors 'silent)
 (let ((default-file-name-handler-alist file-name-handler-alist)
       (default-load-suffixes load-suffixes)
