@@ -105,7 +105,7 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 })
 
 --- Packages ---
-local profile = os.getenv("NVIM_PROFILE") or "self"
+local profile = os.getenv("NVIM_PROFILE") or "mini"
 if profile == "self" and not (vim.version().minor >= 12 or vim.version().major > 0) then
   vim.notify("Neovim version is lower than 0.12.0, switching 'mini' distribution.", vim.log.levels.WARN)
   profile = "mini"
