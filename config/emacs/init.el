@@ -484,10 +484,13 @@
 (use-package beacon
   :hook (prog-mode . beacon-mode)
   :config
+  (setq beacon-blink-when-point-moves-horizontally 3)
+  (setq beacon-blink-when-point-moves-vertically 3)
   (setq beacon-blink-duration 0.5)
   (setq beacon-blink-delay 0.5)
   (setq beacon-size 50)
-  (setq beacon-blink-when-focused t))
+  (setq beacon-blink-when-focused t)
+  (setq beacon-color (face-attribute 'cursor :background nil t)))
 
 (use-package highlight-numbers
   :hook (prog-mode . highlight-numbers-mode))
