@@ -20,6 +20,7 @@
 (use-package use-package
   :ensure nil
   :custom
+  (use-package-compute-statistics t)
   (use-package-always-ensure t)
   (use-package-always-defer t)
   (use-package-expand-minimally t)
@@ -55,7 +56,6 @@
                              "SF Mono"
                              "Hack"
                              "Source Code Pro"
-                             "Monaco"
                              "DejaVu Sans Mono"
                              "Consolas")
                when (find-font (font-spec :name font))
@@ -283,8 +283,21 @@
 
 (use-package eglot
   :ensure nil
+  :commands eglot
   :config
   (setq eglot-events-buffer-size 0))
+
+(use-package python
+  :ensure nil
+  :mode ("\\.py\\'" . python-mode)
+  :hook
+  (python-mode . (lambda ()
+                   (setq-local tab-width 4)
+                   (setq-local indent-tabs-mode nil)
+                   (electric-indent-local-mode -1)))
+  :config
+  (setq python-indent-guess-indent-offset nil)
+  (setq python-indent-offset 4))
 
 ;;;; EVIL
 (use-package evil
@@ -442,7 +455,7 @@
 (use-package doom-modeline
   :hook (after-init . doom-modeline-mode)
   :config
-  (setq doom-modeline-height 25)
+  (setq doom-modeline-height 30)
   (setq doom-modeline-bar-width 5)
   (setq doom-modeline-minor-modes t))
 
@@ -452,10 +465,10 @@
   (dired-sidebar-mode . hide-mode-line-mode))
 
 (use-package centaur-tabs
-  :defer 10
+  :defer 5
   :config
   (setq centaur-tabs-style "bar")
-  (setq centaur-tabs-height 25)
+  (setq centaur-tabs-height 30)
   (setq centaur-tabs-set-icons t)
   (setq centaur-tabs-icon-type 'nerd-icons)
   (setq centaur-tabs-gray-out-icons 'buffer)
@@ -477,21 +490,23 @@
   :when (<= emacs-major-version 30)
   :hook (emacs-lisp-mode . highlight-defined-mode))
 
-(use-package indent-bars
-  :hook
-  ((prog-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
-  (emacs-lisp-mode . (lambda () (indent-bars-mode -1)))
-  :config
-  (setq indent-bars-display-on-blank-lines nil)
-  (setq indent-bars-color '(font-lock-comment-face :face-bg nil :blend 0.4))
-  (setq indent-bars-highlight-current-depth '(:face default :blend 0.4))
-  (setq indent-bars-pattern ".")
-  (setq indent-bars-width-frac 0.1)
-  (setq indent-bars-pad-frac 0.1)
-  (setq indent-bars-color-by-depth nil)
-  (setq indent-bars-no-descend-string t)
-  (setq indent-bars-prefer-character t)
-  (setq indent-bars-no-stipple-char ?│))
+(unless (eq system-type 'windows-nt)
+  (use-package indent-bars
+    :hook
+    ((prog-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
+    (emacs-lisp-mode . (lambda () (indent-bars-mode -1)))
+    :config
+    (setq indent-bars-display-on-blank-lines 'least)
+    (setq indent-bars-color '(font-lock-comment-face :face-bg nil :blend 0.425))
+    (setq indent-bars-highlight-current-depth nil)
+    (setq indent-bars-pattern ".")
+    (setq indent-bars-width-frac 0.1)
+    (setq indent-bars-pad-frac 0.1)
+    (setq indent-bars-starting-column 0)
+    (setq indent-bars-color-by-depth nil)
+    (setq indent-bars-no-descend-string t)
+    (setq indent-bars-prefer-character t)
+    (setq indent-bars-no-stipple-char ?│)))
 
 (use-package breadcrumb
   :hook (prog-mode . breadcrumb-local-mode))
@@ -712,7 +727,7 @@
   :hook
   ((prog-mode yaml-mode yaml-ts-mode) . symbol-overlay-mode)
   :bind
-  (("M-i" . symbol-overlay-input)
+  (("M-i" . symbol-overlay-put)
    ("M-N" . symbol-overlay-jump-next)
    ("M-P" . symbol-overlay-jump-prev)
    ("M-R" . symbol-overlay-remove-all))
@@ -793,12 +808,12 @@
 (use-package find-file-in-project
   :commands project-find-file)
 
-(use-package olivetti
-  :commands olivetti-mode
+(use-package writeroom-mode
+  :commands writeroom-mode
   :config
-  (setq olivetti-body-width 60)
-  (setq olivetti-style 'fancy)
-  (setq olivetti-margin-width 5))
+  (setq writeroom-width 120)
+  (setq writeroom-bottom-divider-width 0)
+  (setq writeroom-fringes-outside-margins t))
 
 (use-package pretty-hydra
   :bind
@@ -952,7 +967,7 @@
   (setq flycheck-emacs-lisp-load-path 'inherit)
   (setq flycheck-idle-change-delay 1.0)
   (setq flycheck-buffer-switch-check-intermediate-buffers t)
-  (setq flycheck-display-errors-delay 0.24))
+  (setq flycheck-display-errors-delay 0.25))
 
 (use-package flycheck-popup-tip
   :hook (flycheck-mode . flycheck-popup-tip-mode)
@@ -1049,20 +1064,20 @@
   :config
   (setq dape-buffer-window-arrangement 'right))
 
-(use-package mason
-  :when (not (eq system-type 'windows-nt))
-  :hook (prog-mode . (lambda ()
-                       (require 'mason)
-                       (mason-setup))))
+(unless (eq system-type 'windows-nt)
+  (use-package mason
+    :hook (prog-mode . (lambda ()
+                         (require 'mason)
+                         (mason-setup)))))
 
 ;;;; TERMINAL
-(use-package ghostel
-  :when (not (eq system-type 'windows-nt))
-  :commands ghostel)
+(unless (eq system-type 'windows-nt)
+  (use-package ghostel
+    :commands ghostel))
 
-(use-package eat
-  :when (not (eq system-type 'windows-nt))
-  :commands eat)
+(unless (eq system-type 'windows-nt)
+  (use-package eat
+    :commands eat))
 
 (use-package eshell-syntax-highlighting
   :hook (eshell-mode . eshell-syntax-highlighting-mode))
