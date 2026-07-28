@@ -422,6 +422,10 @@
 (use-package doom-themes
   :hook (after-init . (lambda () (load-theme 'doom-one t))))
 
+(use-package nyan-mode
+  :when (display-graphic-p)
+  :hook (after-init . nyan-mode))
+
 (use-package dashboard
   :hook
   (after-init . dashboard-setup-startup-hook)
@@ -545,6 +549,13 @@
   (setq diff-hl-update-async t)
   (setq diff-hl-global-modes '(not image-mode pdf-view-mode)))
 
+(use-package which-key-posframe
+  :when (display-graphic-p)
+  :hook (which-key-mode . which-key-posframe-mode)
+  :config
+  (setq which-key-posframe-parameters '((left-fringe . 12) (right-fringe . 12)))
+  (setq which-key-posframe-poshandler 'posframe-poshandler-frame-center))
+
 ;;;; WINDOW
 (use-package winum
   :hook (after-init . winum-mode))
@@ -646,6 +657,13 @@
           (counsel-search . 2)
           (t . 3))))
 
+(use-package ivy-posframe
+  :when (display-graphic-p)
+  :hook (ivy-mode . ivy-posframe-mode)
+  :config
+  (setq ivy-posframe-parameters '((left-fringe . 12) (right-fringe . 12)))
+  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center))))
+
 (use-package ivy-rich
   :hook (ivy-mode . ivy-rich-mode))
 
@@ -699,6 +717,10 @@
   (setq company-dabbrev-other-buffers nil)
   (setq company-dabbrev-ignore-case nil)
   (setq company-dabbrev-downcase nil))
+
+(use-package company-posframe
+  :when (display-graphic-p)
+  :hook (global-company-mode . company-posframe-mode))
 
 (use-package company-box
   :when (display-graphic-p)
@@ -1009,7 +1031,15 @@
   (setq flycheck-buffer-switch-check-intermediate-buffers t)
   (setq flycheck-display-errors-delay 0.25))
 
+(use-package flycheck-posframe
+  :when (display-graphic-p)
+  :hook (flycheck-mode . flycheck-posframe-mode)
+  :config
+  (setq flycheck-posframe-position 'frame-center)
+  (setq flycheck-posframe-border-width 1))
+
 (use-package flycheck-popup-tip
+  :when (not (display-graphic-p))
   :hook (flycheck-mode . flycheck-popup-tip-mode)
   :config
   (setq flycheck-popup-tip-error-prefix "[!] "))
