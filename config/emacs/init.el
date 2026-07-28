@@ -490,23 +490,22 @@
   :when (<= emacs-major-version 30)
   :hook (emacs-lisp-mode . highlight-defined-mode))
 
-(unless (eq system-type 'windows-nt)
-  (use-package indent-bars
-    :hook
-    ((prog-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
-    (emacs-lisp-mode . (lambda () (indent-bars-mode -1)))
-    :config
-    (setq indent-bars-display-on-blank-lines 'least)
-    (setq indent-bars-color '(font-lock-comment-face :face-bg nil :blend 0.425))
-    (setq indent-bars-highlight-current-depth nil)
-    (setq indent-bars-pattern ".")
-    (setq indent-bars-width-frac 0.1)
-    (setq indent-bars-pad-frac 0.1)
-    (setq indent-bars-starting-column 0)
-    (setq indent-bars-color-by-depth nil)
-    (setq indent-bars-no-descend-string t)
-    (setq indent-bars-prefer-character t)
-    (setq indent-bars-no-stipple-char ?│)))
+(use-package indent-bars
+  :hook
+  ((prog-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
+  (emacs-lisp-mode . (lambda () (indent-bars-mode -1)))
+  :config
+  (setq indent-bars-display-on-blank-lines 'least)
+  (setq indent-bars-color '(font-lock-comment-face :face-bg nil :blend 0.425))
+  (setq indent-bars-highlight-current-depth nil)
+  (setq indent-bars-pattern ".")
+  (setq indent-bars-width-frac 0.1)
+  (setq indent-bars-pad-frac 0.1)
+  (setq indent-bars-starting-column 0)
+  (setq indent-bars-color-by-depth nil)
+  (setq indent-bars-no-descend-string t)
+  (setq indent-bars-prefer-character t)
+  (setq indent-bars-no-stipple-char ?│))
 
 (use-package breadcrumb
   :hook (prog-mode . breadcrumb-local-mode))
