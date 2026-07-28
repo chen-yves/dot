@@ -272,6 +272,7 @@
   :ensure nil
   :config
   (setq dired-dwim-target t)
+  (setq dired-kill-when-opening-new-dired-buffer t)
   (setq dired-auto-revert-buffer #'dired-buffer-stale-p)
   (setq dired-recursive-copies 'always)
   (setq dired-recursive-deletes 'top))
@@ -490,22 +491,23 @@
   :when (<= emacs-major-version 30)
   :hook (emacs-lisp-mode . highlight-defined-mode))
 
-(use-package indent-bars
-  :hook
-  ((prog-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
-  (emacs-lisp-mode . (lambda () (indent-bars-mode -1)))
-  :config
-  (setq indent-bars-display-on-blank-lines 'least)
-  (setq indent-bars-color '(font-lock-comment-face :face-bg nil :blend 0.425))
-  (setq indent-bars-highlight-current-depth nil)
-  (setq indent-bars-pattern ".")
-  (setq indent-bars-width-frac 0.1)
-  (setq indent-bars-pad-frac 0.1)
-  (setq indent-bars-starting-column 0)
-  (setq indent-bars-color-by-depth nil)
-  (setq indent-bars-no-descend-string t)
-  (setq indent-bars-prefer-character t)
-  (setq indent-bars-no-stipple-char ?│))
+(unless (eq system-type 'windows-nt)
+  (use-package indent-bars
+    :hook
+    ((prog-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
+    (emacs-lisp-mode . (lambda () (indent-bars-mode -1)))
+    :config
+    (setq indent-bars-display-on-blank-lines 'least)
+    (setq indent-bars-color '(font-lock-comment-face :face-bg nil :blend 0.425))
+    (setq indent-bars-highlight-current-depth nil)
+    (setq indent-bars-pattern ".")
+    (setq indent-bars-width-frac 0.1)
+    (setq indent-bars-pad-frac 0.1)
+    (setq indent-bars-starting-column 0)
+    (setq indent-bars-color-by-depth nil)
+    (setq indent-bars-no-descend-string t)
+    (setq indent-bars-prefer-character t)
+    (setq indent-bars-no-stipple-char ?│)))
 
 (use-package breadcrumb
   :hook (prog-mode . breadcrumb-local-mode))
@@ -770,6 +772,15 @@
 (use-package vundo
   :commands vundo)
 
+(use-package quickrun
+  :commands quickrun
+  :config
+  (setq quickrun-focus-p nil)
+  (setq quickrun-truncate-lines nil))
+
+(use-package scratch
+  :commands scratch)
+
 (use-package esup
   :commands esup
   :config
@@ -844,12 +855,34 @@
       ("0" (lambda () (interactive) (text-scale-increase 0)) "reset" :color blue)))))
 
 ;;;; VC
+(use-package ibuffer-vc
+  :after ibuffer
+  :hook (ibuffer-mode . (lambda ()
+                          (ibuffer-vc-set-filter-groups-by-vc-root)
+                          (unless (eq ibuffer-filtering-qualifiers nil)
+                            (ibuffer-update nil t)))))
+
 (use-package magit
   :commands magit-status
   :config
   (when (eq system-type 'windows-nt)
     (setq magit-commit-show-diff nil)
     (setq magit-diff-refine-hunk nil)))
+
+(use-package magit-todos
+  :hook (magit-mode . magit-todos-mode)
+  :config
+  (setq magit-todos-nice nil))
+
+(use-package blamer
+  :bind
+  (("s-i" . blamer-show-commit-info)
+   ("C-c i" . blamer-show-posframe-commit-info))
+  :hook (prog-mode . global-blamer-mode)
+  :custom-face (blamer-face ((t :foreground "#7a88cf" :background nil :height 110 :italic t)))
+  :config
+  (setq blamer-idle-time 0.3)
+  (setq blamer-min-offset 60))
 
 ;;;; LANGUAGE
 (use-package lua-mode
