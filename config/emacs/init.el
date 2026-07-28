@@ -467,6 +467,11 @@
 
 (use-package centaur-tabs
   :defer 5
+  :after evil
+  :bind
+  (:map evil-normal-state-map
+        ("g t" . centaur-tabs-forward)
+        ("g T" . centaur-tabs-backward))
   :config
   (setq centaur-tabs-style "bar")
   (setq centaur-tabs-height 30)
