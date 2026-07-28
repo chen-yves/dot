@@ -3,6 +3,7 @@
 ;;; Code:
 
 (setq package-enable-at-startup nil)
+(setq use-package-enable-imenu-support t)
 (setq load-prefer-newer t)
 (setq gc-cons-percentage 1.0)
 (setq gc-cons-threshold most-positive-fixnum)
@@ -27,7 +28,6 @@
 (prefer-coding-system 'utf-8-unix)
 (setq-default buffer-file-coding-system 'utf-8-unix)
 (setq default-process-coding-system '(utf-8-unix . utf-8-unix))
-(setq use-package-enable-imenu-support t)
 (setq inhibit-startup-message t)
 (setq inhibit-startup-screen t)
 (setq frame-inhibit-implied-resize t)
