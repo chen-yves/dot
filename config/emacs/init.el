@@ -294,8 +294,7 @@
   :hook
   (python-mode . (lambda ()
                    (setq-local tab-width 4)
-                   (setq-local indent-tabs-mode nil)
-                   (electric-indent-local-mode -1)))
+                   (setq-local indent-tabs-mode nil)))
   :config
   (setq python-indent-guess-indent-offset nil)
   (setq python-indent-offset 4))
@@ -552,8 +551,10 @@
 (use-package which-key-posframe
   :when (display-graphic-p)
   :hook (which-key-mode . which-key-posframe-mode)
+  :custom-face (which-key-posframe-border ((t (:inherit cursor :background nil))))
   :config
-  (setq which-key-posframe-parameters '((left-fringe . 12) (right-fringe . 12)))
+  (setq which-key-posframe-border-width 2)
+  (setq which-key-posframe-parameters '((left-fringe . 8) (right-fringe . 8)))
   (setq which-key-posframe-poshandler 'posframe-poshandler-frame-center))
 
 ;;;; WINDOW
@@ -660,8 +661,10 @@
 (use-package ivy-posframe
   :when (display-graphic-p)
   :hook (ivy-mode . ivy-posframe-mode)
+  :custom-face (ivy-posframe-border ((t (:inherit cursor))))
   :config
-  (setq ivy-posframe-parameters '((left-fringe . 12) (right-fringe . 12)))
+  (setq ivy-posframe-border-width 2)
+  (setq ivy-posframe-parameters '((left-fringe . 8) (right-fringe . 8)))
   (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center))))
 
 (use-package ivy-rich
@@ -702,7 +705,10 @@
   (setq company-tooltip-limit 15)
   (setq company-tooltip-align-annotations t)
   (setq company-require-match 'never)
-  (setq company-idle-delay 0.3)
+  (setq company-idle-delay 0.2)
+  (setq company-tooltip-margin 3)
+  (setq company-tooltip-annotation-padding 3)
+  (setq company-text-icons-add-background t)
   (setq company-global-modes '(not
                                erc-mode
                                help-mode
@@ -722,14 +728,9 @@
   :when (display-graphic-p)
   :hook (global-company-mode . company-posframe-mode))
 
-(use-package company-box
+(use-package company-quickhelp
   :when (display-graphic-p)
-  :hook (company-mode . company-box-mode)
-  :config
-  (setq company-box-icon-alist 'company-box-icons-all-the-icons)
-  (setq company-box-show-single-candidate t)
-  (setq company-box-backends-colors nil)
-  (setq company-box-tooltip-limit 50))
+  :hook (global-company-mode . company-quickhelp-mode))
 
 ;;;; Snippets
 (use-package yasnippet
