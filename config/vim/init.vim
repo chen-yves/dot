@@ -30,7 +30,6 @@ set ruler
 set nowrap
 set showcmd
 set wildmenu
-set cursorline
 set scrolloff=5
 set hlsearch
 set incsearch

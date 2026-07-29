@@ -147,13 +147,6 @@
   :ensure nil
   :hook (after-init . (lambda () (load-theme 'modus-operandi-tinted t))))
 
-(use-package outline
-  :ensure nil
-  :hook (emacs-lisp-mode . outline-minor-mode)
-  :config
-  (setq outline-minor-mode-cycle t)
-  (setq outline-minor-mode-highlight t))
-
 (use-package syntax
   :ensure nil
   :config

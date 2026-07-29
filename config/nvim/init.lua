@@ -11,7 +11,6 @@
 vim.opt.autowrite = true
 vim.opt.clipboard = "unnamed,unnamedplus"
 vim.opt.cmdheight = 1
-vim.opt.cursorline = true
 vim.opt.history = 2000
 vim.opt.virtualedit = "block"
 vim.opt.number = true
