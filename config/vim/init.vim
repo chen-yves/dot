@@ -48,13 +48,13 @@ set noswapfile
 set timeout
 set timeoutlen=300
 set hidden
-set mouse=a
 set signcolumn=yes
 set splitbelow
 set splitright
 set completeopt=menuone,noinsert,noselect,preview
 set pumheight=15
 set pumwidth=30
+set mouse=
 
 " Keybindings:
 let g:mapleader = "\<Space>"
@@ -192,6 +192,7 @@ augroup ui_terminus
   autocmd!
   autocmd BufReadPost * call plug#load('terminus')
         \| autocmd! ui_terminus
+        \| set mouse=
 augroup END
 
 Plug 'ntpeters/vim-better-whitespace', { 'on': [] }

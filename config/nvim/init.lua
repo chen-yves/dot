@@ -19,6 +19,7 @@ vim.opt.relativenumber = true
 vim.opt.expandtab = true
 vim.opt.shiftwidth = 2
 vim.opt.softtabstop = 2
+vim.opt.mouse = ""
 vim.opt.textwidth = 80
 vim.opt.wrap = false
 vim.cmd.colorscheme("habamax")
