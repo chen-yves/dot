@@ -114,10 +114,10 @@
                         (setq face-font-rescale-alist `((,font . 1.0)))
                         (set-fontset-font t 'han (font-spec :family font))))))
   :hook
-  (window-setup . my/setup-fonts)
-  (server-after-make-frame . my/setup-fonts)
-  (minibuffer-setup-hook . (lambda () (setq gc-cons-threshold most-positive-fixnum)))
-  (minibuffer-exit-hook . (lambda () (setq gc-cons-threshold 800000)))
+  ((window-setup . my/setup-fonts)
+   (server-after-make-frame . my/setup-fonts)
+   (minibuffer-setup-hook . (lambda () (setq gc-cons-threshold most-positive-fixnum)))
+   (minibuffer-exit-hook . (lambda () (setq gc-cons-threshold 800000))))
   :config
   (fset 'yes-or-no-p 'y-or-n-p)
   ;; (setq default-text-properties '(line-spacing 0.3 line-height 1.15))
@@ -145,8 +145,7 @@
 
 (use-package modus-themes
   :ensure nil
-  :hook
-  (after-init . (lambda () (load-theme 'modus-operandi-tinted t))))
+  :hook (after-init . (lambda () (load-theme 'modus-operandi-tinted t))))
 
 (use-package outline
   :ensure nil
@@ -154,18 +153,6 @@
   :config
   (setq outline-minor-mode-cycle t)
   (setq outline-minor-mode-highlight t))
-
-(use-package mouse
-  :ensure nil
-  :config
-  (setq mouse-yank-at-point t)
-  (fset 'mouse-save-then-kill 'ignore))
-
-(use-package subr
-  :ensure nil
-  :bind
-  ("<mouse-1>" . nil)
-  ("<mouse-2>" . nil))
 
 (use-package syntax
   :ensure nil
@@ -177,17 +164,12 @@
   :config
   (setq vc-handled-backends '(Git)))
 
-(use-package indent
-  :ensure nil
-  :config
-  (setq-default tab-always-indent 'complete))
-
 (use-package simple
   :ensure nil
   :hook
-  (after-init . size-indication-mode)
-  (after-init . line-number-mode)
-  (after-init . column-number-mode)
+  ((after-init . size-indication-mode)
+   (after-init . line-number-mode)
+   (after-init . column-number-mode))
   :config
   (setq-default indent-tabs-mode nil)
   (setq completion-auto-select nil))
@@ -199,16 +181,11 @@
 
 (use-package paren
   :ensure nil
-  :hook
-  (prog-mode . show-paren-mode)
-  :config
-  (setq show-paren-when-point-inside-paren t)
-  (setq show-paren-when-point-in-periphery t))
+  :hook (prog-mode . show-paren-mode))
 
 (use-package elec-pair
   :ensure nil
-  :hook
-  (prog-mode . electric-pair-mode))
+  :hook (prog-mode . electric-pair-mode))
 
 (use-package display-line-numbers
   :ensure nil
@@ -231,12 +208,6 @@
   :config
   (setq recentf-filename-handlers '(abbreviate-file-name))
   (setq recentf-exclude `("/ssh:" "/TAGS\\'" "COMMIT_EDITMSG\\'")))
-
-(use-package repeat
-  :ensure nil
-  :hook (after-init . repeat-mode)
-  :config
-  (setq repeat-exit-key (kbd "RET")))
 
 (use-package whitespace
   :ensure nil
@@ -269,8 +240,7 @@
 
 (use-package ibuffer
   :ensure nil
-  :bind
-  (([remap list-buffers] . ibuffer))
+  :bind (([remap list-buffers] . ibuffer))
   :config
   (setq ibuffer-show-empty-filter-groups nil)
   (setq ibuffer-filter-group-name-face '(:inherit (success bold))))
@@ -302,10 +272,9 @@
 (use-package python
   :ensure nil
   :mode ("\\.py\\'" . python-mode)
-  :hook
-  (python-mode . (lambda ()
-                   (setq-local tab-width 4)
-                   (setq-local indent-tabs-mode nil)))
+  :hook (python-mode . (lambda ()
+                         (setq-local tab-width 4)
+                         (setq-local indent-tabs-mode nil)))
   :config
   (setq python-indent-guess-indent-offset nil)
   (setq python-indent-offset 4))
@@ -400,8 +369,8 @@
    ("M-`" . popper-cycle)
    ("C-M-`" . popper-toggle-type))
   :hook
-  (window-setup . popper-mode)
-  (popper-mode . popper-echo-mode)
+  ((window-setup . popper-mode)
+   (popper-mode . popper-echo-mode))
   :config
   (setq popper-mode-line "")
   (setq popper-reference-buffers
@@ -512,8 +481,7 @@
                                 ("NOTE" success bold))))
 
 (use-package symbol-overlay
-  :hook
-  ((prog-mode yaml-mode yaml-ts-mode) . symbol-overlay-mode)
+  :hook ((prog-mode yaml-mode yaml-ts-mode) . symbol-overlay-mode)
   :bind
   (("M-i" . symbol-overlay-put)
    ("M-N" . symbol-overlay-jump-next)
@@ -531,8 +499,7 @@
    ("C-h C-d" . helpful-at-point)))
 
 (use-package ace-window
-  :bind
-  (([remap other-window] . ace-window))
+  :bind (([remap other-window] . ace-window))
   :config
   (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 
@@ -574,11 +541,10 @@
 ;;;; VC
 (use-package ibuffer-vc
   :after ibuffer
-  :hook
-  (ibuffer-mode . (lambda ()
-                    (ibuffer-vc-set-filter-groups-by-vc-root)
-                    (unless (eq ibuffer-filtering-qualifiers nil)
-                      (ibuffer-update nil t)))))
+  :hook (ibuffer-mode . (lambda ()
+                          (ibuffer-vc-set-filter-groups-by-vc-root)
+                          (unless (eq ibuffer-filtering-qualifiers nil)
+                            (ibuffer-update nil t)))))
 
 (use-package magit
   :commands magit-status)
@@ -632,9 +598,8 @@
 ;;;; WORKSPACE
 (use-package projectile
   :hook (after-init . projectile-mode)
-  :bind
-  (:map projectile-mode-map
-        ("C-c p" . projectile-command-map)))
+  :bind (:map projectile-mode-map
+              ("C-c p" . projectile-command-map)))
 
 (use-package persp-mode
   :hook (after-init . persp-mode)
@@ -653,10 +618,10 @@
 (use-package persp-mode-projectile-bridge
   :after (persp-mode projectile)
   :hook
-  (persp-mode . persp-mode-projectile-bridge-mode)
-  (persp-mode-projectile-bridge-mode . (lambda ()
-                                         (if persp-mode-projectile-bridge-mode
-                                             (persp-mode-projectile-bridge-find-perspectives-for-all-buffers)
-                                           (persp-mode-projectile-bridge-kill-perspectives)))))
+  ((persp-mode . persp-mode-projectile-bridge-mode)
+   (persp-mode-projectile-bridge-mode . (lambda ()
+                                          (if persp-mode-projectile-bridge-mode
+                                              (persp-mode-projectile-bridge-find-perspectives-for-all-buffers)
+                                            (persp-mode-projectile-bridge-kill-perspectives))))))
 
 ;;; init.el ends here
