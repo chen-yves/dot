@@ -36,7 +36,8 @@
   (setq package-archives
         '(("gnu" . "https://elpa.gnu.org/packages/")
           ("nongnu" . "https://elpa.nongnu.org/nongnu/")
-          ("melpa" . "https://melpa.org/packages/"))))
+          ("melpa" . "https://melpa.org/packages/")
+          ("jcs-elpa" . "https://jcs-emacs.github.io/jcs-elpa/packages/"))))
 
 (use-package emacs
   :ensure nil
@@ -47,8 +48,9 @@
       (require 'cl-lib)
       ;; Default
       (cl-loop for font in '("FiraCode Nerd Font"
-                             "CaskaydiaCove Nerd Font"
                              "JetbrainsMono Nerd Font"
+                             "JetbrainsMono NF"
+                             "CaskaydiaCove Nerd Font"
                              "Fira Code"
                              "Cascadia Code"
                              "Monaco"
@@ -67,6 +69,7 @@
 
       ;; Modeline
       (cl-loop for font in '("JetbrainsMono Nerd Font"
+                             "JetbrainsMono NF"
                              "Cascadia Code"
                              "Monaco"
                              "Menlo"
@@ -113,9 +116,14 @@
   :hook
   (window-setup . my/setup-fonts)
   (server-after-make-frame . my/setup-fonts)
+  (minibuffer-setup-hook . (lambda () (setq gc-cons-threshold most-positive-fixnum)))
+  (minibuffer-exit-hook . (lambda () (setq gc-cons-threshold 800000)))
   :config
+  (fset 'yes-or-no-p 'y-or-n-p)
   ;; (setq default-text-properties '(line-spacing 0.3 line-height 1.15))
+  (setq use-dialog-box nil)
   (setq fast-but-imprecise-scrolling t)
+  (setq ring-bell-function 'ignore)
   (setq long-line-threshold 1000)
   (setq large-hscroll-threshold 1000)
   (setq inhibit-compacting-font-caches t)
@@ -127,11 +135,18 @@
   (setq scroll-conservatively 100000)
   (setq scroll-preserve-screen-position t)
   (setq auto-window-vscroll nil)
+  (setq enable-recursive-minibuffers t)
   (setq-default bidi-display-reordering nil)
   (setq-default bidi-paragraph-direction 'left-to-right)
   (setq-default tab-width 2)
   (setq-default create-lockfiles nil)
-  (setq-default truncate-lines t))
+  (setq-default truncate-lines t)
+  (setq frame-resize-pixelwise t))
+
+(use-package modus-themes
+  :ensure nil
+  :hook
+  (after-init . (lambda () (load-theme 'modus-operandi-tinted t))))
 
 (use-package outline
   :ensure nil
@@ -167,7 +182,8 @@
   (after-init . line-number-mode)
   (after-init . column-number-mode)
   :config
-  (setq-default indent-tabs-mode nil))
+  (setq-default indent-tabs-mode nil)
+  (setq completion-auto-select nil))
 
 (use-package cus-edit
   :ensure nil
@@ -242,6 +258,8 @@
 (use-package files
   :ensure nil
   :config
+  (setq require-final-newline nil)
+  (setq enable-local-variables :all)
   (setq auto-save-default nil)
   (setq make-backup-files nil))
 
@@ -329,45 +347,11 @@
   (:map evil-visual-state-map
         ("gc" . evilnc-comment-or-uncomment-lines)))
 
-(use-package evil-goggles
-  :hook (evil-mode . evil-goggles-mode)
-  :config
-  (setq evil-goggles-pulse t)
-  (setq evil-goggles-duration 0.5)
-  (evil-goggles-use-diff-faces))
-
 (use-package evil-matchit
   :hook (evil-mode . global-evil-matchit-mode))
 
-(use-package evil-surround
-  :hook (evil-mode . global-evil-surround-mode))
-
 (use-package evil-visualstar
   :hook (evil-mode . global-evil-visualstar-mode))
-
-(use-package evil-indent-plus
-  :after evil
-  :bind
-  (:map evil-inner-text-objects-map
-        ("i" . evil-indent-plus-i-indent)
-        ("I" . evil-indent-plus-i-indent-up)
-        ("J" . evil-indent-plus-i-indent-up-down))
-  (:map evil-outer-text-objects-map
-        ("i" . evil-indent-plus-a-indent)
-        ("I" . evil-indent-plus-a-indent-up)
-        ("J" . evil-indent-plus-a-indent-up-down)))
-
-(use-package evil-snipe
-  :hook
-  (evil-mode . evil-snipe-mode)
-  (evil-mode . evil-snipe-override-mode)
-  :config
-  (setq evil-snipe-scope 'whole-buffer)
-  (setq evil-snipe-repeat-scope 'whole-buffer))
-
-(use-package evil-terminal-cursor-changer
-  :when (not (display-graphic-p))
-  :hook (evil-mode . etcc-on))
 
 (use-package evil-leader
   :hook (evil-mode . global-evil-leader-mode)
@@ -378,23 +362,10 @@
     "T" 'emacs-init-time
     "p" 'projectile-command-map
     "ff" 'find-file
-    "fs" 'swiper-isearch
-    "fo" 'counsel-outline
-    "fw" 'counsel-rg
-    "fW" 'counsel-grep
-    "fb" 'counsel-ibuffer
-    "fr" 'counsel-recentf
-    "fi" 'counsel-imenu
-    "gl" 'avy-goto-line
-    "gw" 'avy-goto-word-0
-    "gc" 'avy-goto-char-timer
     "ww" 'ace-window
     "wd" 'delete-other-windows
     "wD" 'delete-window
     "wm" 'toggle-frame-maximized
-    "tn" 'dired-sidebar-toggle-sidebar
-    "tv" 'vundo
-    "tm" 'minimap-mode
     "hd" 'helpful-at-point
     "hf" 'helpful-callable
     "hv" 'helpful-variable
@@ -402,138 +373,11 @@
     "hk" 'helpful-key))
 
 ;;;; UI
-
-(use-package catppuccin-theme)
-(use-package zenburn-theme)
-(use-package nord-theme)
-(use-package nordic-night-theme)
-(use-package spacemacs-theme)
-(use-package gruvbox-theme)
-(use-package ayu-theme)
-(use-package seoul256-theme)
-(use-package material-theme)
-(use-package atom-one-dark-theme)
-(use-package ef-themes)
-(use-package kanagawa-themes)
-(use-package standard-themes)
-(use-package color-theme-sanityinc-tomorrow)
-(use-package color-theme-sanityinc-solarized)
-(use-package doom-themes
-  :hook (after-init . (lambda () (load-theme 'doom-one t))))
-
-(use-package nyan-mode
-  :when (display-graphic-p)
-  :hook (after-init . nyan-mode))
-
-(use-package dashboard
-  :hook
-  (after-init . dashboard-setup-startup-hook)
-  :config
-  (setq dashboard-display-icons-p t)
-  (setq dashboard-set-file-icons t)
-  (setq dashboard-week-agenda nil)
-  (setq dashboard-icon-type 'nerd-icons)
-  (setq dashboard-icon-file-height 1.25)
-  (setq dashboard-icon-file-v-adjust -0.125)
-  (setq dashboard-heading-icon-height 1.25)
-  (setq dashboard-heading-icon-v-adjust -0.125)
-  (setq dashboard-startup-banner 'logo)
-  (setq dashboard-center-content t)
-  (setq dashboard-vertically-center-content t)
-  (setq dashboard-navigation-cycle t)
-  (setq dashboard-projects-backend 'projectile)
-  (setq dashboard-heading-shorcut-format " [%s]")
-  (setq dashboard-item-shortcuts '((recents . "r")
-                                   (bookmarks . "m")
-                                   (projects . "p")
-                                   (agenda . "a")
-                                   (registers . "e")))
-  (setq dashboard-items '((recents . 10)
-                          (projects . 5)
-                          (registers . 5))))
-
-(use-package solaire-mode
-  :hook
-  (after-init . solaire-global-mode))
-
-(use-package doom-modeline
-  :hook (after-init . doom-modeline-mode)
-  :config
-  (setq doom-modeline-height 30)
-  (setq doom-modeline-bar-width 5)
-  (setq doom-modeline-minor-modes t))
-
-(use-package hide-mode-line
-  :hook
-  (completion-list-mode . hide-mode-line-mode)
-  (dired-sidebar-mode . hide-mode-line-mode))
-
-(use-package centaur-tabs
-  :defer 5
-  :after evil
-  :bind
-  (:map evil-normal-state-map
-        ("g t" . centaur-tabs-forward)
-        ("g T" . centaur-tabs-backward))
-  :config
-  (setq centaur-tabs-style "bar")
-  (setq centaur-tabs-height 30)
-  (setq centaur-tabs-set-icons t)
-  (setq centaur-tabs-icon-type 'nerd-icons)
-  (setq centaur-tabs-gray-out-icons 'buffer)
-  (setq centaur-tabs-set-bar 'over)
-  (centaur-tabs-mode))
-
-(use-package beacon
-  :hook (prog-mode . beacon-mode)
-  :config
-  (setq beacon-blink-when-point-moves-horizontally 3)
-  (setq beacon-blink-when-point-moves-vertically 3)
-  (setq beacon-blink-duration 0.5)
-  (setq beacon-blink-delay 0.5)
-  (setq beacon-size 50)
-  (setq beacon-blink-when-focused t)
-  (setq beacon-color (face-attribute 'cursor :background nil t)))
-
-(use-package highlight-numbers
-  :hook (prog-mode . highlight-numbers-mode))
-
-(use-package highlight-defined
-  :when (<= emacs-major-version 30)
-  :hook (emacs-lisp-mode . highlight-defined-mode))
-
-(unless (eq system-type 'windows-nt)
-  (use-package indent-bars
-    :hook
-    ((prog-mode yaml-mode yaml-ts-mode) . indent-bars-mode)
-    (emacs-lisp-mode . (lambda () (indent-bars-mode -1)))
-    :config
-    (setq indent-bars-display-on-blank-lines 'least)
-    (setq indent-bars-color '(font-lock-comment-face :face-bg nil :blend 0.425))
-    (setq indent-bars-highlight-current-depth nil)
-    (setq indent-bars-pattern ".")
-    (setq indent-bars-width-frac 0.1)
-    (setq indent-bars-pad-frac 0.1)
-    (setq indent-bars-starting-column 0)
-    (setq indent-bars-color-by-depth nil)
-    (setq indent-bars-no-descend-string t)
-    (setq indent-bars-prefer-character t)
-    (setq indent-bars-no-stipple-char ?│)))
-
-(use-package breadcrumb
-  :hook (prog-mode . breadcrumb-local-mode))
-
-(use-package minions
-  :hook (doom-modeline-mode . minions-mode))
-
 (use-package nerd-icons-ibuffer
   :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
 
 (use-package nerd-icons-dired
   :hook (dired-mode . nerd-icons-dired-mode))
-
-(use-package nerd-icons-grep
-  :hook (grep-mode . nerd-icons-grep-mode))
 
 (use-package diredfl
   :hook (dired-mode . diredfl-mode))
@@ -548,19 +392,13 @@
   (setq diff-hl-update-async t)
   (setq diff-hl-global-modes '(not image-mode pdf-view-mode)))
 
-(use-package which-key-posframe
-  :when (display-graphic-p)
-  :hook (which-key-mode . which-key-posframe-mode)
-  :custom-face (which-key-posframe-border ((t (:inherit cursor :background nil))))
-  :config
-  (setq which-key-posframe-border-width 2)
-  (setq which-key-posframe-parameters '((left-fringe . 8) (right-fringe . 8)))
-  (setq which-key-posframe-poshandler 'posframe-poshandler-frame-center))
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+(use-package colorful-mode
+  :hook (prog-mode . colorful-mode))
 
 ;;;; WINDOW
-(use-package winum
-  :hook (after-init . winum-mode))
-
 (use-package popper
   :bind
   (("C-`" . popper-toggle)
@@ -617,122 +455,70 @@
           "\\*docker-.+\\*" "\\*prolog\\*" "\\*rustfmt\\*$"
           inferior-python-mode inf-ruby-mode swift-repl-mode)))
 
-(use-package ligature
-  :hook (after-init . global-ligature-mode)
-  :config
-  (ligature-set-ligatures 't '("www"))
-  (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
-  (ligature-set-ligatures 'prog-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
-                                       ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
-                                       "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
-                                       "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
-                                       "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
-                                       "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
-                                       "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
-                                       "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
-                                       ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
-                                       "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
-                                       "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
-                                       "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
-                                       "\\\\" "://")))
-
 ;;;; COMPLETION
-(use-package ivy
-  :hook (after-init . ivy-mode)
-  :config
-  (setq ivy-dynamic-exhibit-delay-ms 250)
-  (setq ivy-height 17)
-  (setq ivy-wrap t)
-  (setq ivy-fix-height-minibuffer t)
-  (setq ivy-use-virtual-buffers nil)
-  (setq ivy-virtual-abbreviate 'full)
-  (setq ivy-on-del-error-function #'ignore)
-  (setq ivy-use-selectable-prompt t)
-  (setq ivy-sort-max-size 7500)
-  (setq ivy-initial-inputs-alist nil)
-  (setq ivy-count-format " [%d/%d] ")
-  (setq ivy-re-builders-alist
-        `((t . ivy--regex-ignore-order)))
-  (setq ivy-more-chars-alist
-        '((counsel-rg . 2)
-          (counsel-search . 2)
-          (t . 3))))
-
-(use-package ivy-posframe
-  :when (display-graphic-p)
-  :hook (ivy-mode . ivy-posframe-mode)
-  :custom-face (ivy-posframe-border ((t (:inherit cursor))))
-  :config
-  (setq ivy-posframe-border-width 2)
-  (setq ivy-posframe-parameters '((left-fringe . 8) (right-fringe . 8)))
-  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center))))
-
-(use-package ivy-rich
-  :hook (ivy-mode . ivy-rich-mode))
-
-(use-package counsel-etags
-  :commands counsel-etags-grep)
-
-(use-package nerd-icons-ivy-rich
-  :hook (ivy-mode . nerd-icons-ivy-rich-mode))
-
-(use-package counsel
-  :hook (ivy-mode . counsel-mode)
+(use-package vertico
+  :hook (after-init . vertico-mode)
   :bind
-  (("C-c r" . counsel-rg)
-   ("C-c R" . counsel-grep-or-swiper-backward)
-   ("C-c c" . counsel-load-theme)
-   ("C-c i" . counsel-imenu)
-   ("C-c F" . counsel-recentf)
-   ("C-c o" . counsel-outline)))
+  (:map vertico-map
+        ("RET" . vertico-directory-enter)
+        ("DEL" . vertico-directory-delete-char)
+        ("M-DEL" . vertico-directory-delete-word))
+  :config
+  (setq vertico-count 17)
+  (setq vertico-scroll-margin 0)
+  (setq vertico-resize nil)
+  (setq vertico-cycle t))
 
-(use-package amx
-  :hook (ivy-mode . amx-mode))
+(use-package marginalia
+  :hook (vertico-mode . marginalia-mode))
 
-(use-package swiper
+(use-package nerd-icons-completion
+  :hook (marginalia-mode . nerd-icons-completion-marginalia-setup))
+
+(use-package orderless
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles partial-completion))))
+  (completion-pcm-leading-wildcard t))
+
+(use-package consult
   :bind
-  (("C-s" . swiper-isearch)))
+  (("C-s" . consult-line)))
 
-(use-package wgrep
-  :commands wgrep-change-to-wgrep-mode
+(use-package corfu
+  :hook
+  ((after-init . global-corfu-mode)
+   (global-corfu-mode . corfu-popupinfo-mode)
+   (global-corfu-mode . corfu-history-mode))
   :config
-  (setq wgrep-auto-save-buffer t))
+  (setq corfu-auto t)
+  (setq corfu-auto-prefix 1)
+  (setq corfu-count 13)
+  (setq corfu-preview-current nil)
+  (setq corfu-on-exact-match nil)
+  (setq corfu-auto-delay 0.2)
+  (setq corfu-popupinfo-delay '(0.4 . 0.2))
+  (setq global-corfu-modes '((not erc-mode circe-mode help-mode helpful-mode gud-mode) t)))
 
-(use-package company
-  :hook (after-init . global-company-mode)
+(use-package nerd-icons-corfu
+  :after corfu
   :config
-  (setq company-minimum-prefix-length 2)
-  (setq company-tooltip-limit 15)
-  (setq company-tooltip-align-annotations t)
-  (setq company-require-match 'never)
-  (setq company-idle-delay 0.2)
-  (setq company-tooltip-margin 3)
-  (setq company-tooltip-annotation-padding 3)
-  (setq company-text-icons-add-background t)
-  (setq company-global-modes '(not
-                               erc-mode
-                               help-mode
-                               helpful-mode
-                               gud-mode
-                               vterm-mode))
-  (setq company-frontends '(company-pseudo-tooltip-frontend company-echo-metadata-frontend))
-  (setq company-backends '((company-capf :with company-yasnippet)
-                           (company-dabbrev-code company-keywords)
-                           company-files))
-  (setq company-auto-commit nil)
-  (setq company-dabbrev-other-buffers nil)
-  (setq company-dabbrev-ignore-case nil)
-  (setq company-dabbrev-downcase nil))
+  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
-(use-package company-posframe
-  :when (display-graphic-p)
-  :hook (global-company-mode . company-posframe-mode))
+(use-package cape
+  :after corfu
+  :config
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-elisp-block)
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+  (advice-add 'eglot-completion-at-point :around #'cape-wrap-nonexclusive))
 
-(use-package company-quickhelp
-  :when (display-graphic-p)
-  :hook (global-company-mode . company-quickhelp-mode))
+(use-package yasnippet-capf
+  :after cape
+  :config
+  (add-to-list 'completion-at-point-functions #'yasnippet-capf))
 
-;;;; Snippets
 (use-package yasnippet
   :hook (prog-mode . yas-minor-mode)
   :config
@@ -741,6 +527,9 @@
 (use-package yasnippet-snippets)
 
 ;;;; TOOL
+(use-package inhibit-mouse
+  :hook (after-init . inhibit-mouse-mode))
+
 (use-package hl-todo
   :hook (prog-mode . hl-todo-mode)
   :config
@@ -766,19 +555,6 @@
   :config
   (setq symbol-overlay-idle-time 0.3))
 
-(use-package minimap
-  :commands minimap-mode
-  :config
-  (setq minimap-update-delay 0.24)
-  (setq minimap-width-fraction 0.16)
-  (setq minimap-window-location 'right))
-
-(use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode))
-
-(use-package colorful-mode
-  :hook (prog-mode . colorful-mode))
-
 (use-package helpful
   :bind
   (("C-h f" . helpful-callable)
@@ -794,38 +570,6 @@
   (setq dired-sidebar-use-term-integration t)
   (setq dired-sidebar-use-custom-font t))
 
-(use-package avy
-  :bind
-  (("M-g l" . avy-goto-line)
-   ("M-g w" . avy-goto-word-0)
-   ("M-g c" . avy-goto-char-timer)))
-
-(use-package vundo
-  :commands vundo)
-
-(use-package quickrun
-  :commands quickrun
-  :config
-  (setq quickrun-focus-p nil)
-  (setq quickrun-truncate-lines nil))
-
-(use-package scratch
-  :commands scratch)
-
-(use-package esup
-  :commands esup
-  :config
-  (setq esup-depth 0))
-
-(use-package symbols-outline
-  :commands symbols-outline-show
-  :hook
-  ((lsp-mode eglot-managed-mode) . (lambda ()
-                                     (setq-local symbols-outline-fetch-fn #'symbols-outline-lsp-fetch)
-                                     (symbols-outline-follow-mode)))
-  :config
-  (setq symbols-outline-window-position 'right))
-
 (use-package ace-window
   :bind
   (([remap other-window] . ace-window))
@@ -836,25 +580,10 @@
   :hook (after-init . xclip-mode))
 
 (use-package gcmh
-  :hook (after-init . gcmh-mode)
-  :config
-  (setq gcmh-verbose t))
-
-(use-package exec-path-from-shell
-  :when (memq window-system '(mac ns x))
-  :defer 5
-  :config
-  (exec-path-from-shell-initialize))
+  :hook (after-init . gcmh-mode))
 
 (use-package find-file-in-project
   :commands project-find-file)
-
-(use-package writeroom-mode
-  :commands writeroom-mode
-  :config
-  (setq writeroom-width 120)
-  (setq writeroom-bottom-divider-width 0)
-  (setq writeroom-fringes-outside-margins t))
 
 (use-package pretty-hydra
   :bind
@@ -871,8 +600,8 @@
      "Split & Close"
      (("s" split-window-below "horizontal")
       ("v" split-window-right "vertical")
-      ("d" delete-window "close current window" :color blue)
-      ("o" delete-other-windows "close other windows" :color blue))
+      ("d" delete-window "close current window")
+      ("o" delete-other-windows "close other windows"))
      "Resize"
      (("=" enlarge-window "larger")
       ("-" shrink-window "smaller")
@@ -883,7 +612,7 @@
     ("Text Scale"
      (("=" text-scale-increase "larger")
       ("-" text-scale-decrease "smaller")
-      ("0" (lambda () (interactive) (text-scale-increase 0)) "reset" :color blue)))))
+      ("0" (lambda () (interactive) (text-scale-increase 0)) "reset")))))
 
 ;;;; VC
 (use-package ibuffer-vc
@@ -900,20 +629,8 @@
     (setq magit-commit-show-diff nil)
     (setq magit-diff-refine-hunk nil)))
 
-(use-package magit-todos
-  :hook (magit-mode . magit-todos-mode)
-  :config
-  (setq magit-todos-nice nil))
-
-(use-package blamer
-  :bind
-  (("s-i" . blamer-show-commit-info)
-   ("C-c i" . blamer-show-posframe-commit-info))
-  :hook (prog-mode . global-blamer-mode)
-  :custom-face (blamer-face ((t :foreground "#7a88cf" :background nil :height 110 :italic t)))
-  :config
-  (setq blamer-idle-time 0.3)
-  (setq blamer-min-offset 60))
+(use-package git-timemachine
+  :commands git-timemachine)
 
 ;;;; LANGUAGE
 (use-package lua-mode
@@ -928,15 +645,6 @@
   :config
   (setq csv-separators '("," ";" "|" " ")))
 
-(use-package clojure-mode
-  :mode "\\.clj\\'")
-
-(use-package haskell-mode
-  :mode "\\.hs\\'")
-
-(use-package go-mode
-  :mode "\\.go\\'")
-
 (use-package markdown-mode
   :mode "\\.md\\'"
   :config
@@ -948,32 +656,17 @@
 (use-package web-mode
   :mode "\\.p?html\\'")
 
-(use-package typescript-mode
-  :mode "\\.ts\\'")
-
 (use-package yaml-mode
   :mode "\\.ya?ml\\'")
 
 (use-package json-mode
   :mode "\\.json\\'")
 
-(use-package rust-mode
-  :mode "\\.rs\\'")
-
 (use-package cmake-mode
   :mode "CMakeLists\\.txt\\'")
 
-(use-package julia-mode
-  :mode "\\.jl\\'")
-
-(use-package ruby-mode
-  :mode "\\.rb\\'")
-
 (use-package nix-mode
   :mode "\\.nix\\'")
-
-(use-package vue-mode
-  :mode "\\.vue\\'")
 
 (use-package powershell
   :mode "\\.ps1\\'")
@@ -981,44 +674,12 @@
 (use-package dotenv-mode
   :mode "\\.env\\'")
 
-(use-package nginx-mode
-  :mode "/nginx/.*\\.conf\\'")
-
-(use-package php-mode
-  :mode "\\.php\\'")
-
-(use-package elixir-mode
-  :mode "\\.exs?\\'")
-
-(use-package scala-mode
-  :mode "\\.s\\(cala\\|bt\\)\\'")
-
 (use-package uv-mode
   :commands uv-mode-auto-activate-hook
   :hook ((python-mode python-ts-mode) . uv-mode-auto-activate-hook))
 
-(use-package vimrc-mode)
-(use-package toml-mode)
-(use-package emmet-mode)
-(use-package angular-mode)
-(use-package scss-mode)
-(use-package sass-mode)
-(use-package mmm-mode)
-(use-package polymode)
-(use-package ess)
-(use-package rjsx-mode)
-(use-package pandoc-mode)
-(use-package git-modes)
-(use-package erlang)
-(use-package groovy-mode)
-(use-package janet-mode)
-(use-package vala-mode)
-(use-package slime)
-(use-package matlab-mode)
-(use-package dart-mode)
-(use-package swift-mode)
-(use-package kotlin-mode)
-(use-package jinja2-mode)
+(use-package toml-mode
+  :mode "\\.toml\\'")
 
 ;;;; SYNTAX
 (use-package flycheck
@@ -1031,19 +692,6 @@
   (setq flycheck-idle-change-delay 1.0)
   (setq flycheck-buffer-switch-check-intermediate-buffers t)
   (setq flycheck-display-errors-delay 0.25))
-
-(use-package flycheck-posframe
-  :when (display-graphic-p)
-  :hook (flycheck-mode . flycheck-posframe-mode)
-  :config
-  (setq flycheck-posframe-position 'frame-center)
-  (setq flycheck-posframe-border-width 1))
-
-(use-package flycheck-popup-tip
-  :when (not (display-graphic-p))
-  :hook (flycheck-mode . flycheck-popup-tip-mode)
-  :config
-  (setq flycheck-popup-tip-error-prefix "[!] "))
 
 ;;;; FORMATTER
 (use-package apheleia
@@ -1078,79 +726,5 @@
                                          (if persp-mode-projectile-bridge-mode
                                              (persp-mode-projectile-bridge-find-perspectives-for-all-buffers)
                                            (persp-mode-projectile-bridge-kill-perspectives)))))
-
-;;;; LSP & DAP
-(use-package lsp-mode
-  :commands (lsp lsp-deferred)
-  :init
-  (setq lsp-keymap-prefix "C-c l")
-  :config
-  (setq lsp-log-io nil)
-  ;; (setq lsp-use-plists t)
-  (setq lsp-idle-delay 0.5)
-  (setq lsp-completion-provider :capf)
-  (setq lsp-headerline-breadcrumb-enable nil)
-  (setq lsp-lens-enable nil)
-  (setq lsp-signature-auto-activate nil)
-  (setq lsp-enable-folding nil)
-  (setq lsp-enable-text-document-color nil)
-  (setq lsp-enable-file-watchers nil)
-  (setq lsp-file-watch-threshold 2000)
-  (setq lsp-semantic-tokens-enable 'deferred))
-
-(use-package lsp-pyright
-  :hook
-  ((python-mode python-ts-mode) . (lambda ()
-                                    (require 'lsp-pyright)
-                                    (setq lsp-pyright-langserver-command "basedpyright"))))
-
-(use-package lsp-ui
-  :commands lsp-ui-mode
-  :after lsp-mode
-  :bind
-  (:map lsp-mode-map
-        ("C-c l d" . lsp-ui-doc-glance))
-  :config
-  (setq lsp-ui-doc-enable nil)
-  (setq lsp-ui-doc-show-with-cursor nil)
-  (setq lsp-ui-doc-delay 0.5)
-  (setq lsp-ui-sideline-enable t)
-  (setq lsp-ui-sideline-show-hover nil)
-  (setq lsp-ui-sideline-show-diagnostics t)
-  (setq lsp-ui-sideline-show-code-actions nil)
-  (setq lsp-ui-sideline-delay 0.5)
-  (setq lsp-ui-peek-enable t)
-  (setq lsp-headerline-breadcrumb-enable nil)
-  (setq lsp-ui-imenu-enable nil))
-
-(use-package dap-mode
-  :commands (dap-debug dap-debug-edit-template)
-  :after lsp-mode
-  :config
-  (setq dap-auto-configure-features '(sessions locals controls tooltip))
-  (setq dap-auto-show-output nil))
-
-(use-package dape
-  :commands dape
-  :config
-  (setq dape-buffer-window-arrangement 'right))
-
-(unless (eq system-type 'windows-nt)
-  (use-package mason
-    :hook (prog-mode . (lambda ()
-                         (require 'mason)
-                         (mason-setup)))))
-
-;;;; TERMINAL
-(unless (eq system-type 'windows-nt)
-  (use-package ghostel
-    :commands ghostel))
-
-(unless (eq system-type 'windows-nt)
-  (use-package eat
-    :commands eat))
-
-(use-package eshell-syntax-highlighting
-  :hook (eshell-mode . eshell-syntax-highlighting-mode))
 
 ;;; init.el ends here
