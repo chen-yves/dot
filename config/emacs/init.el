@@ -16,7 +16,7 @@
 
 ;;; Code:
 
-;;;; CORE
+;;;; BUILTIN
 (use-package use-package
   :ensure nil
   :custom
@@ -297,6 +297,10 @@
 
 (use-package flymake
   :ensure nil
+  :hook (prog-mode . flymake-mode)
+  :bind
+  (("M-n" . flymake-goto-next-error)
+   ("M-p" . flymake-goto-prev-error))
   :config
   (setq flymake-no-changes-timeout 1.0))
 
@@ -362,6 +366,13 @@
     "T" 'emacs-init-time
     "p" 'projectile-command-map
     "ff" 'find-file
+    "fs" 'consult-line
+    "fw" 'consult-ripgrep
+    "fb" 'consult-buffer
+    "fc" 'consult-theme
+    "fi" 'consult-imenu
+    "fo" 'consult-outline
+    "fe" 'consult-flymake
     "ww" 'ace-window
     "wd" 'delete-other-windows
     "wD" 'delete-window
@@ -373,12 +384,6 @@
     "hk" 'helpful-key))
 
 ;;;; UI
-(use-package nerd-icons-ibuffer
-  :hook (ibuffer-mode . nerd-icons-ibuffer-mode))
-
-(use-package nerd-icons-dired
-  :hook (dired-mode . nerd-icons-dired-mode))
-
 (use-package diredfl
   :hook (dired-mode . diredfl-mode))
 
@@ -419,40 +424,26 @@
           "\\*Async Shell Command\\*$"
           "\\*Apropos\\*$"
           "\\*Backtrace\\*$"
-          "\\*Calendar\\*$"
           "\\*Fd\\*$" "\\*Find\\*$" "\\*Finder\\*$"
           "\\*Kill Ring\\*$"
           "\\*Embark \\(Collect\\|Live\\):.*\\*$"
-          bookmark-bmenu-mode
-          comint-mode
           compilation-mode
           help-mode helpful-mode
           tabulated-list-mode
           Buffer-menu-mode
           flymake-diagnostics-buffer-mode
-          gnus-article-mode devdocs-mode
           grep-mode occur-mode rg-mode
-          osx-dictionary-mode fanyi-mode
           "^\\*gt-result\\*$" "^\\*gt-log\\*$"
           "^\\*Process List\\*$" process-menu-mode cargo-process-mode
           "^\\*.*eshell.*\\*.*$" eshell-mode
-          "^\\*ghostel\\*$" ghostel-mode
           "^\\*.*shell.*\\*.*$" shell-mode
           "^\\*.*terminal.*\\*.*$" term-mode
-          "\\*DAP Templates\\*$" dap-server-log-mode
-          "\\*ELP Profiling Results\\*" profiler-report-mode
           "\\*package update results\\*$" "\\*Package-Lint\\*$"
-          "\\*[Wo]*Man.*\\*$"
-          "\\*ert\\*$"
-          "\\*gud-debug\\*$"
-          "\\*lsp-help\\*$" "\\*lsp session\\*$"
           "\\*quickrun\\*$"
           "\\*vc-.*\\**"
           "\\*diff-hl\\**"
           "^\\*macro expansion\\**"
           "\\*Agenda Commands\\*" "\\*Org Select\\*" "\\*Capture\\*" "^CAPTURE-.*\\.org*"
-          "\\*Gofmt Errors\\*$" "\\*Go Test\\*$" godoc-mode
-          "\\*docker-.+\\*" "\\*prolog\\*" "\\*rustfmt\\*$"
           inferior-python-mode inf-ruby-mode swift-repl-mode)))
 
 ;;;; COMPLETION
@@ -468,12 +459,6 @@
   (setq vertico-scroll-margin 0)
   (setq vertico-resize nil)
   (setq vertico-cycle t))
-
-(use-package marginalia
-  :hook (vertico-mode . marginalia-mode))
-
-(use-package nerd-icons-completion
-  :hook (marginalia-mode . nerd-icons-completion-marginalia-setup))
 
 (use-package orderless
   :custom
@@ -499,11 +484,6 @@
   (setq corfu-auto-delay 0.2)
   (setq corfu-popupinfo-delay '(0.4 . 0.2))
   (setq global-corfu-modes '((not erc-mode circe-mode help-mode helpful-mode gud-mode) t)))
-
-(use-package nerd-icons-corfu
-  :after corfu
-  :config
-  (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
 (use-package cape
   :after corfu
@@ -562,13 +542,6 @@
    ("C-h x" . helpful-command)
    ("C-h k" . helpful-key)
    ("C-h C-d" . helpful-at-point)))
-
-(use-package dired-sidebar
-  :commands dired-sidebar-toggle-sidebar
-  :config
-  (setq dired-sidebar-theme 'nerd-icons)
-  (setq dired-sidebar-use-term-integration t)
-  (setq dired-sidebar-use-custom-font t))
 
 (use-package ace-window
   :bind
@@ -629,9 +602,6 @@
     (setq magit-commit-show-diff nil)
     (setq magit-diff-refine-hunk nil)))
 
-(use-package git-timemachine
-  :commands git-timemachine)
-
 ;;;; LANGUAGE
 (use-package lua-mode
   :mode "\\.lua\\'"
@@ -652,9 +622,6 @@
   (setq markdown-enable-math t)
   (setq markdown-hide-markup nil)
   (setq markdown-command "pandoc"))
-
-(use-package web-mode
-  :mode "\\.p?html\\'")
 
 (use-package yaml-mode
   :mode "\\.ya?ml\\'")
@@ -680,18 +647,6 @@
 
 (use-package toml-mode
   :mode "\\.toml\\'")
-
-;;;; SYNTAX
-(use-package flycheck
-  :hook (prog-mode . flycheck-mode)
-  :bind
-  (("M-n" . flycheck-next-error)
-   ("M-p" . flycheck-previous-error))
-  :config
-  (setq flycheck-emacs-lisp-load-path 'inherit)
-  (setq flycheck-idle-change-delay 1.0)
-  (setq flycheck-buffer-switch-check-intermediate-buffers t)
-  (setq flycheck-display-errors-delay 0.25))
 
 ;;;; FORMATTER
 (use-package apheleia
