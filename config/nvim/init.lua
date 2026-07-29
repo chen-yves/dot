@@ -126,8 +126,6 @@ if profile == "lazy" then
     { import = "lazyvim.plugins.extras.coding.luasnip" },
     { import = "lazyvim.plugins.extras.editor.illuminate" },
     { import = "lazyvim.plugins.extras.editor.navic" },
-    { import = "lazyvim.plugins.extras.lang.python" },
-    { import = "lazyvim.plugins.extras.lsp.none-ls" },
     { import = "lazyvim.plugins.extras.ui.treesitter-context" },
     {
       "folke/snacks.nvim",
@@ -154,7 +152,6 @@ if profile == "astro" then
     { import = "astrocommunity.editing-support.nvim-treesitter-context" },
     { import = "astrocommunity.editing-support.rainbow-delimiters-nvim" },
     { import = "astrocommunity.editing-support.todo-comments-nvim" },
-    { import = "astrocommunity.indent.snacks-indent-hlchunk" },
     { import = "astrocommunity.pack.lua" },
   }
 end
@@ -185,15 +182,19 @@ if profile == "mini" then
       lazy = false,
       config = function()
         require("mini.basics").setup()
+        require("mini.completion").setup()
         require("mini.statusline").setup()
         require("mini.tabline").setup()
         require("mini.starter").setup()
+        require("mini.git").setup()
         require("mini.files").setup()
         require("mini.pairs").setup()
         require("mini.bracketed").setup()
         require("mini.cmdline").setup()
         require("mini.icons").setup()
-        require("mini.cursorword").setup()
+        require("mini.cursorword").setup({
+          delay = 250,
+        })
         require("mini.indentscope").setup()
         require("mini.pick").setup()
         vim.keymap.set("n", "<leader>ff", "<Cmd>Pick files<CR>", { desc = "Find Files" })
@@ -613,8 +614,8 @@ if profile == "self" then
         local cmp = require("cmp")
         local lspkind = require("lspkind")
         require("luasnip.loaders.from_lua").lazy_load()
-	require("luasnip.loaders.from_vscode").lazy_load()
-	require("luasnip.loaders.from_snipmate").lazy_load()
+        require("luasnip.loaders.from_vscode").lazy_load()
+        require("luasnip.loaders.from_snipmate").lazy_load()
         cmp.setup({
           window = {
             completion = {
@@ -935,74 +936,6 @@ local common_specs = {
     end
   },
   {
-    "nyoom-engineering/oxocarbon.nvim",
-    lazy = false,
-    enabled = profile == "self",
-  },
-  {
-    "ellisonleao/gruvbox.nvim",
-    lazy = false,
-    enabled = profile == "self",
-    config = function()
-      require("gruvbox").setup({
-        terminal_colors = true,
-        undercurl = true,
-        underline = true,
-        bold = true,
-        italic = {
-          strings = true,
-          emphasis = true,
-          comments = true,
-          operators = false,
-          folds = true,
-        },
-        strikethrough = true,
-        invert_selection = false,
-        invert_signs = false,
-        invert_tabline = false,
-        inverse = true,
-        contrast = "",
-        palette_overrides = {},
-        overrides = {},
-        dim_inactive = false,
-        transparent_mode = false,
-      })
-      -- vim.cmd.colorscheme("gruvbox")
-    end,
-  },
-  {
-    "rebelot/kanagawa.nvim",
-    lazy = false,
-    enabled = profile == "self",
-    config = function()
-      require('kanagawa').setup({
-        compile = false,
-        undercurl = true,
-        commentStyle = { italic = true },
-        functionStyle = {},
-        keywordStyle = { italic = true},
-        statementStyle = { bold = true },
-        typeStyle = {},
-        transparent = false,
-        dimInactive = false,
-        terminalColors = true,
-        colors = {
-          palette = {},
-          theme = { wave = {}, lotus = {}, dragon = {}, all = {} },
-        },
-        overrides = function(colors)
-          return {}
-        end,
-        theme = "wave",
-        background = {
-          dark = "dragon",
-          light = "lotus"
-        },
-      })
-      -- vim.cmd.colorscheme("kanagawa")
-    end,
-  },
-  {
     "EdenEast/nightfox.nvim",
     lazy = false,
     enabled = profile == "self",
@@ -1049,52 +982,6 @@ local common_specs = {
       })
       -- vim.cmd.colorscheme("nordfox")
     end,
-  },
-  {
-    "AlexvZyl/nordic.nvim",
-    lazy = false,
-    enabled = profile == "self",
-    config = function()
-      require('nordic').setup({
-        on_palette = function(palette) end,
-        after_palette = function(palette) end,
-        on_highlight = function(highlights, palette) end,
-        bold_keywords = false,
-        italic_comments = true,
-        transparent = {
-          bg = false,
-          float = false,
-        },
-        bright_border = true,
-        reduced_blue = true,
-        swap_backgrounds = false,
-        cursorline = {
-          bold = false,
-          bold_number = true,
-          theme = 'dark',
-          blend = 0.85,
-        },
-        visual = {
-          bold = true,
-          bold_number = true,
-          theme = 'dark',
-          blend = 0.85,
-        },
-        noice = {
-          style = 'classic',
-        },
-        telescope = {
-          style = 'flat',
-        },
-        leap = {
-          dim_backdrop = false,
-        },
-        ts_context = {
-          dark_background = true,
-        }
-      })
-      -- require('nordic').load()
-    end
   },
 }
 for _, spec in ipairs(common_specs) do

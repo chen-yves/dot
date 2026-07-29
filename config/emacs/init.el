@@ -155,6 +155,18 @@
   (setq outline-minor-mode-cycle t)
   (setq outline-minor-mode-highlight t))
 
+(use-package mouse
+  :ensure nil
+  :config
+  (setq mouse-yank-at-point t)
+  (fset 'mouse-save-then-kill 'ignore))
+
+(use-package subr
+  :ensure nil
+  :bind
+  ("<mouse-1>" . nil)
+  ("<mouse-2>" . nil))
+
 (use-package syntax
   :ensure nil
   :config
@@ -170,11 +182,6 @@
   :config
   (setq-default tab-always-indent 'complete))
 
-(use-package frame
-  :ensure nil
-  :hook
-  (after-init . (lambda () (blink-cursor-mode -1))))
-
 (use-package simple
   :ensure nil
   :hook
@@ -189,19 +196,6 @@
   :ensure nil
   :config
   (setq custom-file (concat (file-name-as-directory user-emacs-directory) "custom.el")))
-
-(use-package winner
-  :ensure nil
-  :hook (after-init . winner-mode)
-  :config
-  (setq winner-dont-bind-my-keys nil))
-
-(use-package jit-lock
-  :ensure nil
-  :config
-  (setq jit-lock-defer-time 0.1)
-  (setq jit-lock-stealth-time nil)
-  (setq jit-lock-chunk-size 1000))
 
 (use-package paren
   :ensure nil
@@ -220,11 +214,6 @@
   :ensure nil
   :hook
   (prog-mode . display-line-numbers-mode))
-
-(use-package hl-line
-  :ensure nil
-  :hook
-  (prog-mode . hl-line-mode))
 
 (use-package autorevert
   :ensure nil
@@ -367,6 +356,7 @@
     "p" 'projectile-command-map
     "ff" 'find-file
     "fs" 'consult-line
+    "fr" 'consult-recent-file
     "fw" 'consult-ripgrep
     "fb" 'consult-buffer
     "fc" 'consult-theme
@@ -507,9 +497,6 @@
 (use-package yasnippet-snippets)
 
 ;;;; TOOL
-(use-package inhibit-mouse
-  :hook (after-init . inhibit-mouse-mode))
-
 (use-package hl-todo
   :hook (prog-mode . hl-todo-mode)
   :config
@@ -555,9 +542,6 @@
 (use-package gcmh
   :hook (after-init . gcmh-mode))
 
-(use-package find-file-in-project
-  :commands project-find-file)
-
 (use-package pretty-hydra
   :bind
   (("C-c w" . hydra-window/body)
@@ -590,17 +574,14 @@
 ;;;; VC
 (use-package ibuffer-vc
   :after ibuffer
-  :hook (ibuffer-mode . (lambda ()
-                          (ibuffer-vc-set-filter-groups-by-vc-root)
-                          (unless (eq ibuffer-filtering-qualifiers nil)
-                            (ibuffer-update nil t)))))
+  :hook
+  (ibuffer-mode . (lambda ()
+                    (ibuffer-vc-set-filter-groups-by-vc-root)
+                    (unless (eq ibuffer-filtering-qualifiers nil)
+                      (ibuffer-update nil t)))))
 
 (use-package magit
-  :commands magit-status
-  :config
-  (when (eq system-type 'windows-nt)
-    (setq magit-commit-show-diff nil)
-    (setq magit-diff-refine-hunk nil)))
+  :commands magit-status)
 
 ;;;; LANGUAGE
 (use-package lua-mode
@@ -647,10 +628,6 @@
 
 (use-package toml-mode
   :mode "\\.toml\\'")
-
-;;;; FORMATTER
-(use-package apheleia
-  :hook (prog-mode . apheleia-mode))
 
 ;;;; WORKSPACE
 (use-package projectile
