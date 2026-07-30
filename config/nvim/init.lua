@@ -134,6 +134,32 @@ if profile == "lazy" then
         },
       },
     },
+    {
+		  "saghen/blink.cmp",
+		  opts = {
+			  completion = {
+				  menu = {
+					  border = "rounded",
+					  winhighlight = "Normal:BlinkCmpDoc,FloatBorder:BlinkCmpDocBorder,CursorLine:BlinkCmpDocCursorLine,Search:None",
+				  },
+				  documentation = {
+					  window = {
+						  border = "rounded",
+					  },
+				  },
+			  },
+		  },
+	  },
+	  {
+		  "mason-org/mason.nvim",
+		  opts = {
+			  ui = {
+				  border = "rounded",
+				  width = 0.92,
+				  height = 0.88,
+			  },
+		  },
+	  },
   }
 end
 if profile == "astro" then
