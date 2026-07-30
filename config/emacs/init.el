@@ -374,7 +374,6 @@
           "\\*Completions\\*$"
           "\\*Warnings\\*$"
           "\\*Async Shell Command\\*$"
-          "\\*Apropos\\*$"
           "\\*Backtrace\\*$"
           "\\*Fd\\*$" "\\*Find\\*$" "\\*Finder\\*$"
           "\\*Kill Ring\\*$"
@@ -395,7 +394,6 @@
           "\\*vc-.*\\**"
           "\\*diff-hl\\**"
           "^\\*macro expansion\\**"
-          "\\*Agenda Commands\\*" "\\*Org Select\\*" "\\*Capture\\*" "^CAPTURE-.*\\.org*"
           inferior-python-mode inf-ruby-mode swift-repl-mode)))
 
 ;;;; COMPLETION
@@ -497,10 +495,14 @@
   (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 
 (use-package xclip
-  :hook (after-init . xclip-mode))
+  :defer 2
+  :config
+  (xclip-mode))
 
 (use-package gcmh
-  :hook (after-init . gcmh-mode))
+  :defer 5
+  :config
+  (gcmh-mode))
 
 (use-package pretty-hydra
   :bind
@@ -569,9 +571,6 @@
 (use-package json-mode
   :mode "\\.json\\'")
 
-(use-package cmake-mode
-  :mode "CMakeLists\\.txt\\'")
-
 (use-package nix-mode
   :mode "\\.nix\\'")
 
@@ -582,7 +581,6 @@
   :mode "\\.env\\'")
 
 (use-package uv-mode
-  :commands uv-mode-auto-activate-hook
   :hook ((python-mode python-ts-mode) . uv-mode-auto-activate-hook))
 
 (use-package toml-mode
