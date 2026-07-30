@@ -10,6 +10,7 @@
 --- Options ---
 vim.opt.autowrite = true
 vim.opt.clipboard = "unnamed,unnamedplus"
+vim.opt.cursorline = true
 vim.opt.cmdheight = 1
 vim.opt.history = 2000
 vim.opt.virtualedit = "block"
@@ -134,32 +135,6 @@ if profile == "lazy" then
         },
       },
     },
-    {
-      "saghen/blink.cmp",
-      opts = {
-        completion = {
-          menu = {
-            border = "rounded",
-            winhighlight = "Normal:BlinkCmpDoc,FloatBorder:BlinkCmpDocBorder,CursorLine:BlinkCmpDocCursorLine,Search:None",
-          },
-          documentation = {
-            window = {
-              border = "rounded",
-            },
-          },
-        },
-      },
-    },
-    {
-      "mason-org/mason.nvim",
-      opts = {
-        ui = {
-          border = "rounded",
-          width = 0.92,
-          height = 0.88,
-        },
-      },
-    },
   }
 end
 if profile == "astro" then
@@ -175,7 +150,6 @@ if profile == "astro" then
     { import = "astrocommunity.comment.ts-comments-nvim" },
     { import = "astrocommunity.diagnostics.trouble-nvim" },
     { import = "astrocommunity.editing-support.nvim-treesitter-context" },
-    { import = "astrocommunity.editing-support.rainbow-delimiters-nvim" },
     { import = "astrocommunity.editing-support.todo-comments-nvim" },
     { import = "astrocommunity.pack.lua" },
   }
@@ -212,15 +186,10 @@ if profile == "mini" then
         require("mini.tabline").setup()
         require("mini.starter").setup()
         require("mini.git").setup()
-        require("mini.files").setup()
         require("mini.pairs").setup()
         require("mini.bracketed").setup()
         require("mini.cmdline").setup()
         require("mini.icons").setup()
-        require("mini.cursorword").setup({
-          delay = 250,
-        })
-        require("mini.indentscope").setup()
         require("mini.pick").setup()
         vim.keymap.set("n", "<leader>ff", "<Cmd>Pick files<CR>", { desc = "Find Files" })
         vim.keymap.set("n", "<leader>fb", "<Cmd>Pick buffers<CR>", { desc = "Find Buffers" })
@@ -344,27 +313,6 @@ if profile == "self" then
       end,
     },
     {
-      "rcarriga/nvim-notify",
-      lazy = true,
-      event = "BufReadPost",
-      config = function()
-        require("notify").setup({
-          stages = "fade",
-          render = "default",
-          fps = 20,
-          timeout = 2000,
-          minimum_width = 50,
-          background_colour = "NotifyBackground",
-          on_open = function(win)
-            vim.api.nvim_set_option_value("winblend", 0, { scope = "local", win = win })
-            vim.api.nvim_win_set_config(win, { zindex = 90 })
-          end,
-          level = "INFO",
-        })
-        vim.notify = require("notify")
-      end,
-    },
-    {
       "lewis6991/gitsigns.nvim",
       lazy = true,
       event = "BufReadPost",
@@ -400,20 +348,17 @@ if profile == "self" then
       },
     },
     {
-      "folke/trouble.nvim",
-      cmd = "Trouble",
-      keys = {
-        { "<leader>xx", function() vim.cmd("Trouble diagnostics toggle") end, mode = { "n" }, desc = "Diagnostics" }
-      },
-      config = function()
-        require("trouble").setup({})
-      end,
-    },
-    {
       "folke/todo-comments.nvim",
       dependencies = { "nvim-lua/plenary.nvim" },
       keys = {
-        { "<leader>fd", function() vim.cmd("TodoFzfLua") end, mode = { "n" }, desc = "Find todo" }
+        {
+          "<leader>fd",
+          function()
+            vim.cmd("TodoFzfLua")
+          end,
+          mode = { "n" },
+          desc = "Find todo",
+        },
       },
       config = function()
         require("todo-comments").setup({})
@@ -445,7 +390,14 @@ if profile == "self" then
       lazy = true,
       event = "BufReadPost",
       keys = {
-        { "<leader>?", function() require("which-key").show({ global = false }) end, mode = { "n", "v" }, desc = "Buffer Local Keymap" }
+        {
+          "<leader>?",
+          function()
+            require("which-key").show({ global = false })
+          end,
+          mode = { "n", "v" },
+          desc = "Buffer Local Keymap",
+        },
       },
       config = function()
         require("which-key").setup({
@@ -459,33 +411,6 @@ if profile == "self" then
       event = "InsertEnter",
       config = function()
         require("nvim-autopairs").setup({})
-      end,
-    },
-    {
-      "HiPhish/rainbow-delimiters.nvim",
-      lazy = true,
-      event = "InsertEnter",
-      config = function()
-        require('rainbow-delimiters.setup').setup({
-          strategy = {
-            [''] = 'rainbow-delimiters.strategy.global',
-            vim = 'rainbow-delimiters.strategy.local',
-          },
-          query = {
-            [''] = 'rainbow-delimiters',
-            lua = 'rainbow-blocks',
-          },
-          highlight = {
-            'RainbowDelimiterRed',
-            'RainbowDelimiterYellow',
-            'RainbowDelimiterBlue',
-            'RainbowDelimiterOrange',
-            'RainbowDelimiterGreen',
-            'RainbowDelimiterViolet',
-            'RainbowDelimiterCyan',
-          },
-        })
-        require("rainbow-delimiters").enable(0)
       end,
     },
     {
@@ -512,15 +437,15 @@ if profile == "self" then
             highlight = { enable = true },
           })
         end
-        require('treesitter-context').setup({
+        require("treesitter-context").setup({
           enable = true,
           multiwindow = false,
           max_lines = 0,
           min_window_height = 0,
           line_numbers = true,
           multiline_threshold = 20,
-          trim_scope = 'outer',
-          mode = 'cursor',
+          trim_scope = "outer",
+          mode = "cursor",
           separator = nil,
           zindex = 20,
           on_attach = nil,
@@ -531,14 +456,70 @@ if profile == "self" then
       "ibhagwan/fzf-lua",
       dependencies = { "nvim-tree/nvim-web-devicons" },
       keys = {
-        { "<leader><leader>", function() vim.cmd("FzfLua commands") end, mode = { "n" }, desc = "Find commands" },
-        { "<leader>ff", function() vim.cmd("FzfLua files") end, mode = { "n" }, desc = "Find files" },
-        { "<leader>fb", function() vim.cmd("FzfLua buffers") end, mode = { "n" }, desc = "Find buffers" },
-        { "<leader>fr", function() vim.cmd("FzfLua oldfiles") end, mode = { "n" }, desc = "Find recent files" },
-        { "<leader>fs", function() vim.cmd("FzfLua blines") end, mode = { "n" }, desc = "Find buffer words" },
-        { "<leader>fS", function() vim.cmd("FzfLua lines") end, mode = { "n" }, desc = "Find all buffer words" },
-        { "<leader>fw", function() vim.cmd("FzfLua live_grep") end, mode = { "n" }, desc = "Find words" },
-        { "<leader>fc", function() vim.cmd("FzfLua colorschemes") end, mode = { "n" }, desc = "Find themes" },
+        {
+          "<leader><leader>",
+          function()
+            vim.cmd("FzfLua commands")
+          end,
+          mode = { "n" },
+          desc = "Find commands",
+        },
+        {
+          "<leader>ff",
+          function()
+            vim.cmd("FzfLua files")
+          end,
+          mode = { "n" },
+          desc = "Find files",
+        },
+        {
+          "<leader>fb",
+          function()
+            vim.cmd("FzfLua buffers")
+          end,
+          mode = { "n" },
+          desc = "Find buffers",
+        },
+        {
+          "<leader>fr",
+          function()
+            vim.cmd("FzfLua oldfiles")
+          end,
+          mode = { "n" },
+          desc = "Find recent files",
+        },
+        {
+          "<leader>fs",
+          function()
+            vim.cmd("FzfLua blines")
+          end,
+          mode = { "n" },
+          desc = "Find buffer words",
+        },
+        {
+          "<leader>fS",
+          function()
+            vim.cmd("FzfLua lines")
+          end,
+          mode = { "n" },
+          desc = "Find all buffer words",
+        },
+        {
+          "<leader>fw",
+          function()
+            vim.cmd("FzfLua live_grep")
+          end,
+          mode = { "n" },
+          desc = "Find words",
+        },
+        {
+          "<leader>fc",
+          function()
+            vim.cmd("FzfLua colorschemes")
+          end,
+          mode = { "n" },
+          desc = "Find themes",
+        },
       },
       config = function()
         require("fzf-lua").setup({
@@ -567,7 +548,7 @@ if profile == "self" then
       end,
     },
     {
-      "williamboman/mason.nvim",
+      "mason-org/mason.nvim",
       config = function()
         require("mason").setup({
           ui = {
@@ -579,7 +560,7 @@ if profile == "self" then
       end,
     },
     {
-      "williamboman/mason-lspconfig.nvim",
+      "mason-org/mason-lspconfig.nvim",
       config = function()
         local mason_lspconfig = require("mason-lspconfig")
         local capabilities = require("cmp_nvim_lsp").default_capabilities()
@@ -616,8 +597,8 @@ if profile == "self" then
       lazy = false,
       dependencies = {
         "hrsh7th/cmp-nvim-lsp",
-        "williamboman/mason.nvim",
-        "williamboman/mason-lspconfig.nvim",
+        "mason-org/mason.nvim",
+        "mason-org/mason-lspconfig.nvim",
       },
       config = function() end,
     },
@@ -662,12 +643,12 @@ if profile == "self" then
                 menu = 50,
                 abbr = 50,
               },
-              ellipsis_char = '...',
+              ellipsis_char = "...",
               show_labelDetails = true,
-              before = function (entry, vim_item)
+              before = function(entry, vim_item)
                 return vim_item
-              end
-            })
+              end,
+            }),
           },
           snippet = {
             expand = function(args)
@@ -687,7 +668,7 @@ if profile == "self" then
             ["<C-d>"] = cmp.mapping.scroll_docs(-4),
             ["<C-f>"] = cmp.mapping.scroll_docs(4),
             ["<C-g>"] = cmp.mapping.abort(),
-            ['<CR>'] = cmp.mapping.confirm({ select = true })
+            ["<CR>"] = cmp.mapping.confirm({ select = true }),
           }),
           sources = {
             { name = "lazydev", group_index = 0 },
@@ -702,18 +683,18 @@ if profile == "self" then
             },
           },
         })
-        cmp.setup.cmdline({ '/', '?' }, {
+        cmp.setup.cmdline({ "/", "?" }, {
           mapping = cmp.mapping.preset.cmdline(),
           sources = {
-            { name = 'buffer' }
-          }
+            { name = "buffer" },
+          },
         })
-        cmp.setup.cmdline(':', {
+        cmp.setup.cmdline(":", {
           mapping = cmp.mapping.preset.cmdline(),
           sources = cmp.config.sources({
-            { name = 'path' }
+            { name = "path" },
           }, {
-            { name = 'cmdline' }
+            { name = "cmdline" },
           }),
         })
       end,
@@ -927,45 +908,11 @@ local common_specs = {
     end,
   },
   {
-    "navarasu/onedark.nvim",
-    lazy = false,
-    enabled = profile == "self",
-    config = function()
-      require("onedark").setup({
-        style = "warmer",
-        transparent = false,
-        term_colors = true,
-        ending_tildes = false,
-        cmp_itemkind_reverse = false,
-        toggle_style_key = nil,
-        toggle_style_list = {'dark', 'darker', 'cool', 'deep', 'warm', 'warmer', 'light'},
-        code_style = {
-          comments = 'italic',
-          keywords = 'none',
-          functions = 'none',
-          strings = 'none',
-          variables = 'none'
-        },
-        lualine = {
-          transparent = false,
-        },
-        colors = {},
-        highlights = {},
-        diagnostics = {
-          darker = true,
-          undercurl = true,
-          background = true,
-        },
-      })
-      -- require("onedark").load()
-    end
-  },
-  {
     "EdenEast/nightfox.nvim",
     lazy = false,
-    enabled = profile == "self",
+    enabled = true,
     config = function()
-      require('nightfox').setup({
+      require("nightfox").setup({
         options = {
           compile_path = vim.fn.stdpath("cache") .. "/nightfox",
           compile_file_suffix = "_compiled",
@@ -1006,6 +953,62 @@ local common_specs = {
         groups = {},
       })
       -- vim.cmd.colorscheme("nordfox")
+    end,
+  },
+  {
+    "saghen/blink.cmp",
+    enabled = profile ~= "self" and profile ~= "mini" and profile ~= "nvchad",
+    opts = {
+      completion = {
+        menu = {
+          border = "rounded",
+          winhighlight = "Normal:BlinkCmpDoc,FloatBorder:BlinkCmpDocBorder,CursorLine:BlinkCmpDocCursorLine,Search:None",
+        },
+        documentation = {
+          window = {
+            border = "rounded",
+          },
+        },
+      },
+    },
+  },
+  {
+    "mason-org/mason.nvim",
+    enabled = true,
+    opts = {
+      ui = {
+        border = "rounded",
+        width = 0.92,
+        height = 0.88,
+      },
+    },
+  },
+  {
+    "HiPhish/rainbow-delimiters.nvim",
+    enabled = true,
+    lazy = true,
+    event = "InsertEnter",
+    config = function()
+      require("rainbow-delimiters.setup").setup({
+        strategy = {
+          [""] = "rainbow-delimiters.strategy.global",
+          vim = "rainbow-delimiters.strategy.local",
+        },
+        query = {
+          [""] = "rainbow-delimiters",
+          lua = "rainbow-blocks",
+        },
+        highlight = {
+          "RainbowDelimiterRed",
+          "RainbowDelimiterYellow",
+          "RainbowDelimiterBlue",
+          "RainbowDelimiterOrange",
+          "RainbowDelimiterGreen",
+          "RainbowDelimiterViolet",
+          "RainbowDelimiterCyan",
+        },
+      })
+      require("rainbow-delimiters").enable(0)
     end,
   },
 }
@@ -1119,7 +1122,6 @@ local function bootstrap_manager(name, specs_tbl)
       end
       return repo
     end
-    -- 用`zpack.nvim`提供類似lazy的管理介面
     vim.pack.add({ gh("zuqini/zpack.nvim") })
     local ok, zpack = pcall(require, "zpack")
     if ok then

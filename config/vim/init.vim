@@ -25,6 +25,7 @@ set termguicolors
 set background=dark
 colorscheme desert
 set number
+set cursorline
 set relativenumber
 set ruler
 set nowrap
