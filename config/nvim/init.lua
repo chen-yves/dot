@@ -22,7 +22,6 @@ vim.opt.softtabstop = 2
 vim.opt.mouse = ""
 vim.opt.textwidth = 80
 vim.opt.wrap = false
-vim.cmd.colorscheme("habamax")
 
 --- Keybindings ---
 vim.g.mapleader = " "
@@ -32,10 +31,10 @@ vim.keymap.set({ "n" }, "j", "gj", { desc = "J" })
 vim.keymap.set({ "n" }, "k", "gk", { desc = "K" })
 vim.keymap.set({ "n" }, "<C-h>", "<C-w>h", { desc = "Go to left window" })
 vim.keymap.set({ "n" }, "<C-j>", "<C-w>j", { desc = "Go to bottom window" })
-vim.keymap.set({ "n" }, "<C-k>", "<C-w>k", { desc = "Go to up window" })
+vim.keymap.set({ "n" }, "<C-k>", "<C-w>k", { desc = "Go to top window" })
 vim.keymap.set({ "n" }, "<C-l>", "<C-w>l", { desc = "Go to right window" })
 vim.keymap.set({ "i", "c" }, "<C-a>", "<Home>", { desc = "Go to line head" })
-vim.keymap.set({ "i", "c" }, "<C-e>", "<End>", { desc = "Go to line head" })
+vim.keymap.set({ "i", "c" }, "<C-e>", "<End>", { desc = "Go to line end" })
 
 --- AutoCommend ---
 vim.api.nvim_create_autocmd("TextYankPost", {
@@ -107,7 +106,7 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 
 --- Bootstrap ---
 local registry = {
-  lazy = {
+  lazyvim = {
     type = "profile",
     manager = "lazy",
     specs = {
@@ -154,6 +153,7 @@ local registry = {
       { import = "astrocommunity.diagnostics.trouble-nvim" },
       { import = "astrocommunity.editing-support.nvim-treesitter-context" },
       { import = "astrocommunity.editing-support.todo-comments-nvim" },
+      { import = "astrocommunity.editing-support.rainbow-delimiters-nvim" },
       { import = "astrocommunity.pack.lua" },
     },
     addons = {},
@@ -164,23 +164,26 @@ local registry = {
   nvchad = {
     type = "profile",
     manager = "lazy",
+    preload = function()
+      vim.g.base46_cache = vim.fn.stdpath("data") .. "/base46/"
+    end,
     specs = {
       {
         "NvChad/NvChad",
-        lazy = false,
         branch = "v2.5",
+        lazy = false,
         config = function()
+          vim.g.base46_cache = vim.fn.stdpath("data") .. "/base46/"
           require("nvchad.options")
           require("nvchad.mappings")
           require("nvchad.autocmds")
-          vim.g.base46_cache = vim.fn.stdpath("data") .. "/base46/"
           if (vim.uv or vim.loop).fs_stat(vim.g.base46_cache .. "defaults") then
             dofile(vim.g.base46_cache .. "defaults")
             dofile(vim.g.base46_cache .. "statusline")
           end
         end,
+        import = "nvchad.plugins",
       },
-      { import = "nvchad.plugins" },
     },
     addons = {
       "rainbow_delimiters",
@@ -189,7 +192,7 @@ local registry = {
       "mason",
     },
   },
-  mini = {
+  minimax = {
     type = "profile",
     manager = "mini",
     specs = {
@@ -197,6 +200,7 @@ local registry = {
         "echasnovski/mini.nvim",
         lazy = false,
         config = function()
+          vim.opt.termguicolors = true
           require("mini.basics").setup()
           require("mini.completion").setup()
           require("mini.statusline").setup()
@@ -992,6 +996,38 @@ local registry = {
       },
     },
   },
+  rainbow_delimiters = {
+    type = "addon",
+    specs = {
+      {
+        "HiPhish/rainbow-delimiters.nvim",
+        lazy = true,
+        event = "InsertEnter",
+        config = function()
+          require("rainbow-delimiters.setup").setup({
+            strategy = {
+              [""] = "rainbow-delimiters.strategy.global",
+              vim = "rainbow-delimiters.strategy.local",
+            },
+            query = {
+              [""] = "rainbow-delimiters",
+              lua = "rainbow-blocks",
+            },
+            highlight = {
+              "RainbowDelimiterRed",
+              "RainbowDelimiterYellow",
+              "RainbowDelimiterBlue",
+              "RainbowDelimiterOrange",
+              "RainbowDelimiterGreen",
+              "RainbowDelimiterViolet",
+              "RainbowDelimiterCyan",
+            },
+          })
+          require("rainbow-delimiters").enable(0)
+        end,
+      },
+    },
+  },
   blink = {
     type = "patch",
     specs = {
@@ -1028,42 +1064,115 @@ local registry = {
       },
     },
   },
-  rainbow_delimiters = {
-    type = "addon",
-    specs = {
-      {
-        "HiPhish/rainbow-delimiters.nvim",
-        lazy = true,
-        event = "InsertEnter",
-        config = function()
-          require("rainbow-delimiters.setup").setup({
-            strategy = {
-              [""] = "rainbow-delimiters.strategy.global",
-              vim = "rainbow-delimiters.strategy.local",
+  lazy = {
+    type = "manager",
+    launcher = function(specs)
+      local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+      if not (vim.uv or vim.loop).fs_stat(lazypath) then
+        local out = vim.fn.system({
+          "git",
+          "clone",
+          "--filter=blob:none",
+          "--branch=stable",
+          "https://github.com/folke/lazy.nvim.git",
+          lazypath,
+        })
+        if vim.v.shell_error ~= 0 then
+          vim.api.nvim_echo({
+            { "failed to clone lazy.nvim:\n", "errormsg" },
+            { out, "warningmsg" },
+          }, true, {})
+          return
+        end
+      end
+      vim.opt.rtp:prepend(lazypath)
+      require("lazy").setup({
+        spec = specs,
+        ui = {
+          size = {
+            width = 0.92,
+            height = 0.88,
+          },
+          border = "rounded",
+          title = " === Lazy Panel === ",
+        },
+        performance = {
+          rtp = {
+            disabled_plugins = {
+              "gzip",
+              "tar",
+              "tarplugin",
+              "zip",
+              "zipplugin",
+              "netrw",
+              "netrwplugin",
+              "netrwsettings",
+              "netrwfilehandlers",
+              "matchit",
+              "matchparen",
+              "tohtml",
+              "tutor",
+              "spellfile",
+              "rplugin",
             },
-            query = {
-              [""] = "rainbow-delimiters",
-              lua = "rainbow-blocks",
-            },
-            highlight = {
-              "RainbowDelimiterRed",
-              "RainbowDelimiterYellow",
-              "RainbowDelimiterBlue",
-              "RainbowDelimiterOrange",
-              "RainbowDelimiterGreen",
-              "RainbowDelimiterViolet",
-              "RainbowDelimiterCyan",
-            },
-          })
-          require("rainbow-delimiters").enable(0)
-        end,
-      },
-    },
+          },
+        },
+      })
+    end,
+  },
+  mini = {
+    type = "manager",
+    launcher = function(specs)
+      local path_package = vim.fn.stdpath("data") .. "/site"
+      local mini_path = path_package .. "/pack/deps/start/mini.nvim"
+      if not (vim.uv or vim.loop).fs_stat(mini_path) then
+        vim.cmd('echo "Installing `mini.nvim`" | redraw')
+        local clone_cmd = {
+          "git",
+          "clone",
+          "--filter=blob:none",
+          "https://github.com/nvim-mini/mini.nvim",
+          mini_path,
+        }
+        vim.fn.system(clone_cmd)
+        vim.cmd("packadd mini.nvim | helptags ALL")
+        vim.cmd('echo "Installed `mini.nvim`" | redraw')
+      end
+      local mini = require("mini.deps")
+      mini.setup({ path = { package = mini_path } })
+      for _, spec in ipairs(specs) do
+        local repo = type(spec) == "table" and spec[1] or spec
+        local is_lazy = type(spec) == "table" and spec.lazy
+        local runner = is_lazy and mini.later or mini.now
+        runner(function()
+          mini.add(repo)
+          if type(spec) == "table" and type(spec.config) == "function" then
+            pcall(spec.config)
+          end
+        end)
+      end
+    end,
+  },
+  zpack = {
+    type = "manager",
+    launcher = function(specs)
+      local gh = function(repo)
+        if type(repo) == "string" and not repo:find("^https://") then
+          return "https://github.com/" .. repo
+        end
+        return repo
+      end
+      vim.pack.add({ gh("zuqini/zpack.nvim") })
+      local ok, zpack = pcall(require, "zpack")
+      if ok then
+        zpack.setup(specs)
+      end
+    end,
   },
 }
 
 local function gen_profile(registry)
-  local default_profile = "mini"
+  local default_profile = "minimax"
   local profile = os.getenv("NVIM_PROFILE") or default_profile
   if not registry[profile] then
     vim.notify(
@@ -1126,107 +1235,16 @@ end
 
 local function main()
   local profile = gen_profile(registry)
-  local manager = profile.registry.manager
+  if type(profile.registry.preload) == "function" then
+    profile.registry.preload()
+  end
   local specs = resolve_specs(profile.registry)
-
-  if manager == "lazy" then
-    local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-    if not (vim.uv or vim.loop).fs_stat(lazypath) then
-      local out = vim.fn.system({
-        "git",
-        "clone",
-        "--filter=blob:none",
-        "--branch=stable",
-        "https://github.com/folke/lazy.nvim.git",
-        lazypath,
-      })
-      if vim.v.shell_error ~= 0 then
-        vim.api.nvim_echo({
-          { "failed to clone lazy.nvim:\n", "errormsg" },
-          { out, "warningmsg" },
-        }, true, {})
-        return
-      end
-    end
-    vim.opt.rtp:prepend(lazypath)
-    require("lazy").setup({
-      spec = specs,
-      ui = {
-        size = {
-          width = 0.92,
-          height = 0.88,
-        },
-        border = "rounded",
-        title = " === Lazy Panel === ",
-      },
-      performance = {
-        rtp = {
-          disabled_plugins = {
-            "gzip",
-            "tar",
-            "tarplugin",
-            "zip",
-            "zipplugin",
-            "netrw",
-            "netrwplugin",
-            "netrwsettings",
-            "netrwfilehandlers",
-            "matchit",
-            "matchparen",
-            "tohtml",
-            "tutor",
-            "spellfile",
-            "rplugin",
-          },
-        },
-      },
-    })
+  local manager_entry = registry[profile.registry.manager]
+  if not manager_entry or manager_entry.type ~= "manager" then
+    vim.notify(("Manager '%s' not found or invalid"):format(profile.registry.manager), vim.log.levels.ERROR)
+    return
   end
-
-  if manager == "mini" then
-    local path_package = vim.fn.stdpath("data") .. "/site"
-    local mini_path = path_package .. "/pack/deps/start/mini.nvim"
-    if not (vim.uv or vim.loop).fs_stat(mini_path) then
-      vim.cmd('echo "Installing `mini.nvim`" | redraw')
-      local clone_cmd = {
-        "git",
-        "clone",
-        "--filter=blob:none",
-        "https://github.com/nvim-mini/mini.nvim",
-        mini_path,
-      }
-      vim.fn.system(clone_cmd)
-      vim.cmd("packadd mini.nvim | helptags ALL")
-      vim.cmd('echo "Installed `mini.nvim`" | redraw')
-    end
-    local mini = require("mini.deps")
-    mini.setup({ path = { package = mini_path } })
-    for _, spec in ipairs(specs) do
-      local repo = type(spec) == "table" and spec[1] or spec
-      local is_lazy = type(spec) == "table" and spec.lazy
-      local runner = is_lazy and mini.later or mini.now
-      runner(function()
-        mini.add(repo)
-        if type(spec) == "table" and type(spec.config) == "function" then
-          pcall(spec.config)
-        end
-      end)
-    end
-  end
-
-  if manager == "zpack" then
-    local gh = function(repo)
-      if type(repo) == "string" and not repo:find("^https://") then
-        return "https://github.com/" .. repo
-      end
-      return repo
-    end
-    vim.pack.add({ gh("zuqini/zpack.nvim") })
-    local ok, zpack = pcall(require, "zpack")
-    if ok then
-      zpack.setup(specs)
-    end
-  end
+  manager_entry.launcher(specs)
 end
 
 main()
