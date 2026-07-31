@@ -13,6 +13,7 @@
 ;;;; - https://github.com/bbatsov/prelude
 ;;;; - https://github.com/Eason0210/.emacs.d
 ;;;; - https://github.com/jamescherti/minimal-emacs.d
+;;;; - https://github.com/LionyxML/emacs-solo
 
 ;;; Code:
 
