@@ -1,7 +1,7 @@
 ;;; init.el --- My Emacs Configuration. -*- lexical-binding: t no-byte-compile: t -*-
 ;;; Commentary:
 
-;;;; Inspirations:
+;;;; References:
 ;;;; - https://github.com/seagle0128/.emacs.d
 ;;;; - https://github.com/redguardtoo/emacs.d
 ;;;; - https://github.com/manateelazycat/lazycat-emacs
