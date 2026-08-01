@@ -184,37 +184,4 @@
       ]
     },
   ],
-  // Catppuccin
-  "workbench.colorTheme": "Catppuccin Mocha",
-  "catppuccin.accentColor": "lavender",
-  "catppuccin.colorOverrides": {
-    "mocha": {
-      "base": "#11111b",
-      "mantle": "#11111b",
-    },
-  },
-  "catppuccin.customUIColors": {
-    "mocha": {
-      "editorLineNumber.activeForeground": "green",
-      "editorLineNumber.foreground": "surface1",
-      "statusBar.foreground": "accent",
-      "widget.border": "accent",
-    },
-  },
-  "catppuccin.italicComments": true,
-  "catppuccin.italicKeywords": true,
-  "catppuccin.boldKeywords": true,
-  "catppuccin.workbenchMode": "minimal",
-  "catppuccin.extraBordersEnabled": true,
-  "catppuccin.bracketMode": "dimmed",
-  "catppuccin.syncWithIconPack": true,
-  // Catppuccin Icon
-  "workbench.iconTheme": "catppuccin-mocha",
-  "catppuccin-icons.associations.extensions": {},
-  "catppuccin-icons.associations.files": {},
-  "catppuccin-icons.associations.folders": {},
-  "catppuccin-icons.associations.languages": {},
-  "catppuccin-icons.hidesExplorerArrows": false,
-  "catppuccin-icons.monochrome": false,
-  "catppuccin-icons.specificFolders": true,
 }
