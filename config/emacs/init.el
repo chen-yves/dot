@@ -48,19 +48,7 @@
     (when (display-graphic-p)
       (require 'cl-lib)
       ;; Default
-      (cl-loop for font in '("FiraCode Nerd Font"
-                             "JetbrainsMono Nerd Font"
-                             "JetbrainsMono NF"
-                             "CaskaydiaCove Nerd Font"
-                             "Fira Code"
-                             "Cascadia Code"
-                             "Monaco"
-                             "Menlo"
-                             "SF Mono"
-                             "Hack"
-                             "Source Code Pro"
-                             "DejaVu Sans Mono"
-                             "Consolas")
+      (cl-loop for font in '("JetbrainsMono Nerd Font" "Monaco" "Consolas")
                when (find-font (font-spec :name font))
                return (set-face-attribute 'default nil
                                           :family font
@@ -69,25 +57,14 @@
                                                         (t 100))))
 
       ;; Modeline
-      (cl-loop for font in '("JetbrainsMono Nerd Font"
-                             "JetbrainsMono NF"
-                             "Cascadia Code"
-                             "Monaco"
-                             "Menlo"
-                             "SF Mono"
-                             "Arial"
-                             "Helvetica"
-                             "Times New Roman")
+      (cl-loop for font in '("JetbrainsMono Nerd Font" "Monaco" "Consolas")
                when (find-font (font-spec :name font))
                return (progn
                         (set-face-attribute 'mode-line nil :family font :inherit 'variable-pitch)
                         (set-face-attribute 'mode-line-inactive nil :family font :inherit 'variable-pitch)))
 
       ;; Symbol
-      (cl-loop for font in '("Apple Symbols"
-                             "Segoe UI Symbol"
-                             "Symbola"
-                             "Symbol")
+      (cl-loop for font in '("Apple Symbols" "Segoe UI Symbol" "Symbola" "Symbol")
                when (find-font (font-spec :name font))
                return (set-fontset-font t 'symbol (font-spec :family font) nil 'prepend))
 
@@ -97,19 +74,12 @@
                return (set-fontset-font t 'unicode (font-spec :family font) nil 'prepend))
 
       ;; Emoji
-      (cl-loop for font in '("Noto Color Emoji"
-                             "Apple Color Emoji"
-                             "Segoe UI Emoji")
+      (cl-loop for font in '("Noto Color Emoji" "Apple Color Emoji" "Segoe UI Emoji")
                when (find-font (font-spec :name font))
                return (set-fontset-font t 'emoji (font-spec :family font) nil 'prepend))
 
       ;; Chinese
-      (cl-loop for font in '("LXGW Neo Xihei"
-                             "LXGW WenKai Mono"
-                             "WenQuanYi Micro Hei Mono"
-                             "PingFang SC"
-                             "Microsoft Yahei UI"
-                             "Simhei")
+      (cl-loop for font in '("LXGW Neo Xihei" "LXGW WenKai Mono" "WenQuanYi Micro Hei Mono" "PingFang TC" "Microsoft Yahei UI" "Simhei")
                when (find-font (font-spec :name font))
                return (progn
                         (setq face-font-rescale-alist `((,font . 1.0)))
@@ -121,7 +91,7 @@
    (minibuffer-exit-hook . (lambda () (setq gc-cons-threshold 800000))))
   :config
   (fset 'yes-or-no-p 'y-or-n-p)
-  ;; (setq default-text-properties '(line-spacing 0.3 line-height 1.15))
+  (setq default-text-properties '(line-spacing 0.2 line-height 1.2))
   (setq use-dialog-box nil)
   (setq fast-but-imprecise-scrolling t)
   (setq ring-bell-function 'ignore)
@@ -147,16 +117,6 @@
 (use-package modus-themes
   :ensure nil
   :hook (after-init . (lambda () (load-theme 'modus-operandi-tinted t))))
-
-(use-package syntax
-  :ensure nil
-  :config
-  (setq syntax-wholeline-max 1000))
-
-(use-package vc-hooks
-  :ensure nil
-  :config
-  (setq vc-handled-backends '(Git)))
 
 (use-package hl-line
   :ensure nil
@@ -202,10 +162,7 @@
 
 (use-package recentf
   :ensure nil
-  :hook (after-init . recentf-mode)
-  :config
-  (setq recentf-filename-handlers '(abbreviate-file-name))
-  (setq recentf-exclude `("/ssh:" "/TAGS\\'" "COMMIT_EDITMSG\\'")))
+  :hook (after-init . recentf-mode))
 
 (use-package whitespace
   :ensure nil
@@ -459,7 +416,8 @@
   :config
   (yas-reload-all))
 
-(use-package yasnippet-snippets)
+(use-package yasnippet-snippets
+  :after yasnippet)
 
 ;;;; TOOL
 (use-package hl-todo
@@ -500,7 +458,7 @@
   (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 
 (use-package xclip
-  :defer 2
+  :defer 5
   :config
   (xclip-mode))
 
@@ -511,32 +469,36 @@
 
 (use-package pretty-hydra
   :bind
-  (("C-c w" . hydra-window/body)
-   ("C-c z" . hydra-text-scale/body))
+  (("C-c w" . hydra-window/body))
   :config
   (pretty-hydra-define hydra-window
-    (:hint nil :color amaranth :quit-key "q" :title "Window Management")
-    ("Move"
+    (:hint nil :color amaranth :quit-key ("q" "C-g") :title "Window Management" :foreign-keys warn)
+    ("Actions"
+     (("TAB" other-window "switch")
+      ("x" ace-delete-window "delete")
+      ("X" ace-delete-other-windows "delete other" :exit t)
+      ("s" ace-swap-window "swap")
+      ("a" ace-select-window "select" :exit t)
+      ("m" toggle-frame-maximized "maximize" :exit t)
+      ("u" toggle-frame-fullscreen "fullscreen" :exit t))
+     "Move"
      (("h" windmove-left "←")
       ("j" windmove-down "↓")
       ("k" windmove-up "↑")
       ("l" windmove-right "→"))
-     "Split & Close"
-     (("s" split-window-below "horizontal")
-      ("v" split-window-right "vertical")
-      ("d" delete-window "close current window")
-      ("o" delete-other-windows "close other windows"))
+     "Split"
+     (("v" split-window-below "vertical")
+      ("r" split-window-right "horizontal")
+      ("t" toggle-window-split "toggle"))
      "Resize"
-     (("=" enlarge-window "larger")
-      ("-" shrink-window "smaller")
-      (">" enlarge-window-horizontally "wider")
-      ("<" shrink-window-horizontally "shrink"))))
-  (pretty-hydra-define hydra-text-scale
-    (:hint nil :color amaranth :quit-key "q" :title "Text Scale")
-    ("Text Scale"
-     (("=" text-scale-increase "larger")
-      ("-" text-scale-decrease "smaller")
-      ("0" (lambda () (interactive) (text-scale-increase 0)) "reset")))))
+     (("=" enlarge-window "enlarge")
+      ("-" shrink-window "shrink")
+      (">" enlarge-window-horizontally "enlarge horizontally")
+      ("<" shrink-window-horizontally "shrink horizontally"))
+     "Zoom"
+     (("=" text-scale-increase "increase")
+      ("-" text-scale-decrease "decrease")
+      ("0" (text-scale-increase 0) "reset" :exit t)))))
 
 ;;;; VC
 (use-package ibuffer-vc
