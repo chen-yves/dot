@@ -158,6 +158,10 @@
   :config
   (setq vc-handled-backends '(Git)))
 
+(use-package hl-line
+  :ensure nil
+  :hook (prog-mode . hl-line-mode))
+
 (use-package simple
   :ensure nil
   :hook
@@ -574,9 +578,6 @@
 
 (use-package nix-mode
   :mode "\\.nix\\'")
-
-(use-package powershell
-  :mode "\\.ps1\\'")
 
 (use-package dotenv-mode
   :mode "\\.env\\'")

@@ -6,7 +6,6 @@
     ./font.nix
     ./ghostty.nix
     ./neovim.nix
-    ./vim.nix
     ./vscode.nix
     ./zsh.nix
   ];

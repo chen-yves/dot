@@ -121,9 +121,6 @@ function Invoke-DotfilesSetup {
     # Neovim
     "$dotfilesRoot\config\nvim\init.lua" = "$env:LOCALAPPDATA\nvim\init.lua"
 
-    # Vim
-    "$dotfilesRoot\config\vim\init.vim" = "$env:USERPROFILE\_vimrc"
-
     # VSCode
     "$dotfilesRoot\config\vscode\keybindings.json" = "$env:APPDATA\Code\User\keybindings.json"
     "$dotfilesRoot\config\vscode\settings.json" = "$env:APPDATA\Code\User\settings.json"

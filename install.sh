@@ -76,9 +76,6 @@ main() {
   # Neovim
   make_link "$DOT_DIR/config/nvim/init.lua" "$HOME/.config/nvim/init.lua"
 
-  # Vim
-  make_link "$DOT_DIR/config/vim/init.vim" "$HOME/.vim/vimrc"
-
   # VSCode
   if [ "$OS" = "macOS" ]; then
     make_link "$DOT_DIR/config/vscode/keybindings.json" "$HOME/Library/Application Support/Code/User/keybindings.json"
