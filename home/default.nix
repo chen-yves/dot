@@ -5,7 +5,6 @@
     ./emacs.nix
     ./font.nix
     ./ghostty.nix
-    ./neovim.nix
     ./vscode.nix
     ./zsh.nix
   ];
