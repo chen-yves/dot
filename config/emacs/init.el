@@ -234,7 +234,12 @@
   (setq python-indent-guess-indent-offset nil)
   (setq python-indent-offset 4))
 
-;;;; EVIL
+(use-package project
+  :ensure nil
+  :config
+  (add-to-list 'project-vc-extra-root-markers ".project"))
+
+;;;; ELPA/MELPA
 (use-package evil
   :hook (after-init . evil-mode)
   :init
@@ -267,9 +272,6 @@
 (use-package evil-matchit
   :hook (evil-mode . global-evil-matchit-mode))
 
-(use-package evil-visualstar
-  :hook (evil-mode . global-evil-visualstar-mode))
-
 (use-package evil-leader
   :hook (evil-mode . global-evil-leader-mode)
   :config
@@ -277,7 +279,10 @@
   (evil-leader/set-key
     "SPC" 'execute-extended-command
     "T" 'emacs-init-time
-    "p" 'projectile-command-map
+    "pf" 'project-find-file
+    "pp" 'project-switch-project
+    "pb" 'project-list-buffers
+    "pa" 'project-remember-projects-under
     "ff" 'find-file
     "fs" 'consult-line
     "fr" 'consult-recent-file
@@ -297,7 +302,6 @@
     "hx" 'helpful-command
     "hk" 'helpful-key))
 
-;;;; UI
 (use-package diredfl
   :hook (dired-mode . diredfl-mode))
 
@@ -317,7 +321,6 @@
 (use-package colorful-mode
   :hook (prog-mode . colorful-mode))
 
-;;;; WINDOW
 (use-package popper
   :bind
   (("C-`" . popper-toggle)
@@ -358,7 +361,6 @@
           "^\\*macro expansion\\**"
           inferior-python-mode inf-ruby-mode swift-repl-mode)))
 
-;;;; COMPLETION
 (use-package vertico
   :hook (after-init . vertico-mode)
   :bind
@@ -419,7 +421,6 @@
 (use-package yasnippet-snippets
   :after yasnippet)
 
-;;;; TOOL
 (use-package hl-todo
   :hook (prog-mode . hl-todo-mode)
   :config
@@ -500,7 +501,6 @@
       ("-" text-scale-decrease "decrease")
       ("0" (text-scale-increase 0) "reset" :exit t)))))
 
-;;;; VC
 (use-package ibuffer-vc
   :after ibuffer
   :hook (ibuffer-mode . (lambda ()
@@ -511,7 +511,6 @@
 (use-package magit
   :commands magit-status)
 
-;;;; LANGUAGE
 (use-package lua-mode
   :mode "\\.lua\\'"
   :config
@@ -549,34 +548,5 @@
 
 (use-package toml-mode
   :mode "\\.toml\\'")
-
-;;;; WORKSPACE
-(use-package projectile
-  :hook (after-init . projectile-mode)
-  :bind (:map projectile-mode-map
-              ("C-c p" . projectile-command-map)))
-
-(use-package persp-mode
-  :hook (after-init . persp-mode)
-  :config
-  (setq persp-autokill-buffer-on-remove 'kill-weak)
-  (setq persp-reset-windows-on-nil-window-conf nil)
-  (setq persp-nil-hidden t)
-  (setq persp-auto-save-fname "autosave")
-  (setq persp-set-last-persp-for-new-frames t)
-  (setq persp-switch-to-added-buffer nil)
-  (setq persp-kill-foreign-buffer-behaviour 'kill)
-  (setq persp-remove-buffers-from-nil-persp-behaviour nil)
-  (setq persp-auto-resume-time -1)
-  (setq persp-auto-save-opt (if noninteractive 0 1)))
-
-(use-package persp-mode-projectile-bridge
-  :after (persp-mode projectile)
-  :hook
-  ((persp-mode . persp-mode-projectile-bridge-mode)
-   (persp-mode-projectile-bridge-mode . (lambda ()
-                                          (if persp-mode-projectile-bridge-mode
-                                              (persp-mode-projectile-bridge-find-perspectives-for-all-buffers)
-                                            (persp-mode-projectile-bridge-kill-perspectives))))))
 
 ;;; init.el ends here
