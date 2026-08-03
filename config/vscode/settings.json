@@ -5,6 +5,7 @@
   "editor.fontFamily": "'JetBrainsMono Nerd Font', 'Sarasa Term TC', Consolas, 'Courier New', monospace, Monaco",
   "editor.minimap.enabled": false,
   "window.zoomLevel": -0.7,
+  "workbench.startupEditor": "none",
   "workbench.enableExperiments": false,
   "search.exclude": {
     "**/node_modules": true,
@@ -153,4 +154,5 @@
       ]
     },
   ],
+  "workbench.colorTheme": "One Dark Pro Night Flat",
 }
