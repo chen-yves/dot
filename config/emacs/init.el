@@ -91,20 +91,12 @@
    (minibuffer-exit-hook . (lambda () (setq gc-cons-threshold 800000))))
   :config
   (fset 'yes-or-no-p 'y-or-n-p)
-  (setq use-dialog-box nil)
   (setq fast-but-imprecise-scrolling t)
   (setq ring-bell-function 'ignore)
   (setq long-line-threshold 1000)
   (setq large-hscroll-threshold 1000)
   (setq inhibit-compacting-font-caches t)
   (setq bidi-inhibit-bpa t)
-  (setq hscroll-step 1)
-  (setq hscroll-margin 2)
-  (setq scroll-step 1)
-  (setq scroll-margin 0)
-  (setq scroll-conservatively 100000)
-  (setq scroll-preserve-screen-position t)
-  (setq auto-window-vscroll nil)
   (setq enable-recursive-minibuffers t)
   (setq-default bidi-display-reordering nil)
   (setq-default bidi-paragraph-direction 'left-to-right)
@@ -117,6 +109,12 @@
   :ensure nil
   :hook (after-init . (lambda () (load-theme 'modus-operandi-tinted t))))
 
+(use-package minibuffer
+  :ensure nil
+  :bind
+  (:map minibuffer-local-completion-map
+        ("<SPC>" . nil)))
+
 (use-package hl-line
   :ensure nil
   :hook (prog-mode . hl-line-mode))
@@ -128,8 +126,7 @@
    (after-init . line-number-mode)
    (after-init . column-number-mode))
   :config
-  (setq-default indent-tabs-mode nil)
-  (setq completion-auto-select nil))
+  (setq-default indent-tabs-mode nil))
 
 (use-package cus-edit
   :ensure nil
@@ -163,12 +160,6 @@
   :ensure nil
   :hook (after-init . recentf-mode))
 
-(use-package whitespace
-  :ensure nil
-  :hook ((prog-mode markdown-mode conf-mode) . whitespace-mode)
-  :config
-  (setq whitespace-style '(face trailing)))
-
 (use-package files
   :ensure nil
   :config
@@ -185,6 +176,12 @@
   :ensure nil
   :hook (after-init . global-so-long-mode))
 
+(use-package isearch
+  :ensure nil
+  :config
+  (setq isearch-lazy-count t)
+  (setq isearch-count-prefix-format "[%s/%s] "))
+
 (use-package which-key
   :ensure nil
   :hook (after-init . which-key-mode)
@@ -194,10 +191,7 @@
 
 (use-package ibuffer
   :ensure nil
-  :bind (([remap list-buffers] . ibuffer))
-  :config
-  (setq ibuffer-show-empty-filter-groups nil)
-  (setq ibuffer-filter-group-name-face '(:inherit (success bold))))
+  :bind (([remap list-buffers] . ibuffer)))
 
 (use-package dired
   :ensure nil
@@ -238,6 +232,10 @@
   :config
   (add-to-list 'project-vc-extra-root-markers ".project"))
 
+(use-package icomplete
+  :ensure nil
+  :hook (after-init . fido-vertical-mode))
+
 ;;;; ELPA/MELPA
 (use-package evil
   :hook (after-init . evil-mode)
@@ -260,17 +258,6 @@
   (setq evil-escape-key-sequence "jk")
   (setq evil-escape-delay 0.2))
 
-(use-package evil-nerd-commenter
-  :after evil
-  :bind
-  (:map evil-normal-state-map
-        ("gcc" . evilnc-comment-or-uncomment-lines))
-  (:map evil-visual-state-map
-        ("gc" . evilnc-comment-or-uncomment-lines)))
-
-(use-package evil-matchit
-  :hook (evil-mode . global-evil-matchit-mode))
-
 (use-package evil-leader
   :hook (evil-mode . global-evil-leader-mode)
   :config
@@ -283,14 +270,7 @@
     "pb" 'project-list-buffers
     "pa" 'project-remember-projects-under
     "ff" 'find-file
-    "fs" 'consult-line
-    "fr" 'consult-recent-file
-    "fw" 'consult-ripgrep
-    "fb" 'consult-buffer
-    "fc" 'consult-theme
-    "fi" 'consult-imenu
-    "fo" 'consult-outline
-    "fe" 'consult-flymake
+    "fs" 'isearch-forward
     "ww" 'ace-window
     "wd" 'delete-other-windows
     "wD" 'delete-window
@@ -300,6 +280,13 @@
     "hv" 'helpful-variable
     "hx" 'helpful-command
     "hk" 'helpful-key))
+
+(use-package orderless
+  :hook
+  (minibuffer-setup . (lambda ()
+                        (setq completion-styles '(orderless basic))
+                        (setq completion-category-overrides '((file (styles partial-completion))))
+                        (setq completion-pcm-leading-wildcard t))))
 
 (use-package diredfl
   :hook (dired-mode . diredfl-mode))
@@ -340,11 +327,8 @@
           "\\*Async Shell Command\\*$"
           "\\*Backtrace\\*$"
           "\\*Fd\\*$" "\\*Find\\*$" "\\*Finder\\*$"
-          "\\*Kill Ring\\*$"
-          "\\*Embark \\(Collect\\|Live\\):.*\\*$"
           compilation-mode
           help-mode helpful-mode
-          tabulated-list-mode
           Buffer-menu-mode
           flymake-diagnostics-buffer-mode
           grep-mode occur-mode rg-mode
@@ -359,29 +343,6 @@
           "\\*diff-hl\\**"
           "^\\*macro expansion\\**"
           inferior-python-mode inf-ruby-mode swift-repl-mode)))
-
-(use-package vertico
-  :hook (after-init . vertico-mode)
-  :bind
-  (:map vertico-map
-        ("RET" . vertico-directory-enter)
-        ("DEL" . vertico-directory-delete-char)
-        ("M-DEL" . vertico-directory-delete-word))
-  :config
-  (setq vertico-count 17)
-  (setq vertico-scroll-margin 0)
-  (setq vertico-resize nil)
-  (setq vertico-cycle t))
-
-(use-package orderless
-  :custom
-  (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles partial-completion))))
-  (completion-pcm-leading-wildcard t))
-
-(use-package consult
-  :bind
-  (("C-s" . consult-line)))
 
 (use-package corfu
   :hook
