@@ -53,7 +53,7 @@
                return (set-face-attribute 'default nil
                                           :family font
                                           :height (cond ((eq system-type 'darwin) 130)
-                                                        ((eq system-type 'windows-nt) 100)
+                                                        ((eq system-type 'windows-nt) 110)
                                                         (t 100))))
 
       ;; Modeline
@@ -91,7 +91,6 @@
    (minibuffer-exit-hook . (lambda () (setq gc-cons-threshold 800000))))
   :config
   (fset 'yes-or-no-p 'y-or-n-p)
-  (setq default-text-properties '(line-spacing 0.2 line-height 1.2))
   (setq use-dialog-box nil)
   (setq fast-but-imprecise-scrolling t)
   (setq ring-bell-function 'ignore)
@@ -505,8 +504,8 @@
   :after ibuffer
   :hook (ibuffer-mode . (lambda ()
                           (ibuffer-vc-set-filter-groups-by-vc-root)
-                          (unless (eq ibuffer-filtering-qualifiers nil)
-                            (ibuffer-update nil t)))))
+                          (unless (eq ibuffer-sorting-mode 'filename/process)
+                            (ibuffer-do-sort-by-filename/process)))))
 
 (use-package magit
   :commands magit-status)
