@@ -471,13 +471,6 @@
 (use-package magit
   :commands magit-status)
 
-(use-package lua-mode
-  :mode "\\.lua\\'"
-  :config
-  (setq lua-indent-level 2)
-  (setq lua-indent-nested-block-content-align nil)
-  (setq lua-indent-close-paren-align nil))
-
 (use-package csv-mode
   :mode "\\.[cq]sv\\'"
   :config
