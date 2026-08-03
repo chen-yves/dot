@@ -7,29 +7,10 @@
   "window.zoomLevel": -0.7,
   "workbench.startupEditor": "none",
   "workbench.enableExperiments": false,
-  "search.exclude": {
-    "**/node_modules": true,
-    "**/bower_components": true,
-    "**/*.code-search": true,
-    "**/dist": true,
-    "**/build": true,
-    "**/.git": true,
-    "**/.next": true,
-    "**/.venv": true
-  },
-  "files.watcherExclude": {
-    "**/.git/objects/**": true,
-    "**/.git/subtree-cache/**": true,
-    "**/node_modules/**": true,
-    "**/dist/**": true,
-    "**/build/**": true,
-    "**/.next/**": true,
-    "**/.venv/**": true
-  },
   "extensions.experimental.affinity": {
     "vscodevim.vim": 1
   },
-  // VIM
+  // Vim
   "vim.leader": "<space>",
   "vim.hlsearch": true,
   "vim.showcmd": false,
