@@ -1,5 +1,5 @@
 {
-  // BUILTIN
+  // Builtin
   "editor.fontSize": 14,
   "editor.tabSize": 2,
   "editor.fontFamily": "'JetBrainsMono Nerd Font', 'Sarasa Term TC', Consolas, 'Courier New', monospace, Monaco",
