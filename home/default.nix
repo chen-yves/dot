@@ -1,9 +1,9 @@
 { config, pkgs, ... }:
 {
   imports = [
+    ./alacritty.nix
     ./direnv.nix
     ./font.nix
-    ./ghostty.nix
     ./vscode.nix
     ./zsh.nix
   ];
