@@ -1,22 +1,34 @@
 {
   // Builtin
-  "editor.fontSize": 14,
+  "editor.fontSize": 15,
+  "editor.fontWeight": "600",
   "editor.tabSize": 2,
-  "editor.fontFamily": "'JetBrainsMono Nerd Font', 'Sarasa Term TC', Consolas, 'Courier New', monospace, Monaco",
+  "editor.fontFamily": "'Sarasa Term TC', 'JetBrainsMono Nerd Font', Consolas, 'Courier New', monospace, Monaco",
   "editor.minimap.enabled": false,
-  "window.zoomLevel": -0.7,
+  "window.zoomLevel": -0.6,
   "workbench.startupEditor": "none",
   "workbench.enableExperiments": false,
   "extensions.experimental.affinity": {
     "vscodevim.vim": 1
   },
-  // Vim
+  "editor.tokenColorCustomizations": {
+    "[Catppuccin Macchiato]": {
+      "textMateRules": [
+        {
+          "scope": "comment",
+          "settings": {
+            "foreground": "#939ab7",
+            "fontStyle": "bold",
+          },
+        },
+      ],
+    },
+  },
+  // Plugin: VSCodeVim
   "vim.leader": "<space>",
   "vim.hlsearch": true,
   "vim.showcmd": false,
   "vim.useSystemClipboard": true,
-  "vim.highlightedyank.enable": true,
-  "vim.highlightedyank.duration": 1000,
   "vim.insertModeKeyBindings": [
     {
       "before": [
@@ -135,4 +147,34 @@
       ]
     },
   ],
+  // Plugin: Catppuccin
+  "workbench.colorTheme": "Catppuccin Macchiato",
+  "catppuccin.accentColor": "lavender",
+  "catppuccin.boldKeywords": true,
+  "catppuccin.italicKeywords": false,
+  "catppuccin.italicComments": false,
+  "catppuccin.bracketMode": "dimmed",
+  "catppuccin.extraBordersEnabled": true,
+  "catppuccin.syncWithIconPack": true,
+  "catppuccin.workbenchMode": "default",
+  "catppuccin.colorOverrides": {},
+  "catppuccin.customUIColors": {
+    "all": {
+      "editorLineNumber.activeForeground": "green",
+      "widget.border": "accent",
+    },
+    "macciato": {},
+    "latte": {},
+    "frappe": {},
+    "mocha": {},
+  },
+  // Plugin: Catppuccin Icon
+  "workbench.iconTheme": "catppuccin-macchiato",
+  "catppuccin-icons.associations.extensions": {},
+  "catppuccin-icons.associations.files": {},
+  "catppuccin-icons.associations.folders": {},
+  "catppuccin-icons.associations.languages": {},
+  "catppuccin-icons.hidesExplorerArrows": false,
+  "catppuccin-icons.monochrome": false,
+  "catppuccin-icons.specificFolders": true,
 }
